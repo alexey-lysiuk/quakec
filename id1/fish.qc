@@ -1,4 +1,4 @@
-$cd /raid/quake/id1/models/fish
+$cd id1/models/fish
 $origin 0 0 24
 $base base		
 $skin skin

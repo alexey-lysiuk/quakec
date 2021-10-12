@@ -39,6 +39,7 @@ void() W_FireAxe =
 	local	vector	source;
 	local	vector	org;
 
+	makevectors (self.v_angle);
 	source = self.origin + '0 0 16';
 	traceline (source, source + v_forward*64, FALSE, self);
 	if (trace_fraction == 1.0)
@@ -384,6 +385,7 @@ void() W_FireRocket =
 	missile.owner = self;
 	missile.movetype = MOVETYPE_FLYMISSILE;
 	missile.solid = SOLID_BBOX;
+	missile.classname = "missile";
 		
 // set missile speed	
 
@@ -463,6 +465,7 @@ void(vector p1, vector p2, entity from, float damage) LightningDamage =
 void() W_FireLightning =
 {
 	local	vector		org;
+	local	float		cells;
 
 	if (self.ammo_cells < 1)
 	{
@@ -474,9 +477,10 @@ void() W_FireLightning =
 // explode if under water
 	if (self.waterlevel > 1)
 	{
-		T_RadiusDamage (self, self, 35*self.ammo_cells, world);
+		cells = self.ammo_cells;
 		self.ammo_cells = 0;
 		W_SetCurrentAmmo ();
+		T_RadiusDamage (self, self, 35*cells, world);
 		return;
 	}
 
@@ -826,25 +830,16 @@ float() W_BestWeapon =
 	
 	it = self.items;
 
-	if(self.ammo_cells >= 1 && (it & IT_LIGHTNING) )
-		return IT_LIGHTNING;
-	else if(self.ammo_nails >= 2 && (it & IT_SUPER_NAILGUN) )
+	if (self.waterlevel <= 1 && self.ammo_cells >= 1 && (it & IT_LIGHTNING) )
+			return IT_LIGHTNING;
+	if(self.ammo_nails >= 2 && (it & IT_SUPER_NAILGUN) )
 		return IT_SUPER_NAILGUN;
-	else if(self.ammo_shells >= 2 && (it & IT_SUPER_SHOTGUN) )
+	if(self.ammo_shells >= 2 && (it & IT_SUPER_SHOTGUN) )
 		return IT_SUPER_SHOTGUN;
-	else if(self.ammo_nails >= 1 && (it & IT_NAILGUN) )
+	if(self.ammo_nails >= 1 && (it & IT_NAILGUN) )
 		return IT_NAILGUN;
-	else if(self.ammo_shells >= 1 && (it & IT_SHOTGUN) )
+	if(self.ammo_shells >= 1 && (it & IT_SHOTGUN) )
 		return IT_SHOTGUN;
-		
-/*
-	if(self.ammo_rockets >= 1 && (it & IT_ROCKET_LAUNCHER) )
-		return IT_ROCKET_LAUNCHER;
-	else if(self.ammo_rockets >= 1 && (it & IT_GRENADE_LAUNCHER) )
-		return IT_GRENADE_LAUNCHER;
-
-*/
-
 	return IT_AXE;
 };
 
@@ -1121,7 +1116,81 @@ void() CycleWeaponCommand =
 				am = 1;
 		}
 	
-		if ( (self.items & self.weapon) && am == 0)
+		if ( (it & self.weapon) && am == 0)
+		{
+			W_SetCurrentAmmo ();
+			return;
+		}
+	}
+
+};
+
+/*
+============
+CycleWeaponReverseCommand
+
+Go to the prev weapon with ammo
+============
+*/
+void() CycleWeaponReverseCommand =
+{
+	local	float	it, am;
+	
+	it = self.items;
+	self.impulse = 0;
+
+	while (1)
+	{
+		am = 0;
+
+		if (self.weapon == IT_LIGHTNING)
+		{
+			self.weapon = IT_ROCKET_LAUNCHER;
+			if (self.ammo_rockets < 1)
+				am = 1;
+		}
+		else if (self.weapon == IT_ROCKET_LAUNCHER)
+		{
+			self.weapon = IT_GRENADE_LAUNCHER;
+			if (self.ammo_rockets < 1)
+				am = 1;
+		}
+		else if (self.weapon == IT_GRENADE_LAUNCHER)
+		{
+			self.weapon = IT_SUPER_NAILGUN;
+			if (self.ammo_nails < 2)
+				am = 1;
+		}
+		else if (self.weapon == IT_SUPER_NAILGUN)
+		{
+			self.weapon = IT_NAILGUN;
+			if (self.ammo_nails < 1)
+				am = 1;
+		}
+		else if (self.weapon == IT_NAILGUN)
+		{
+			self.weapon = IT_SUPER_SHOTGUN;
+			if (self.ammo_shells < 2)
+				am = 1;
+		}		
+		else if (self.weapon == IT_SUPER_SHOTGUN)
+		{
+			self.weapon = IT_SHOTGUN;
+			if (self.ammo_shells < 1)
+				am = 1;
+		}
+		else if (self.weapon == IT_SHOTGUN)
+		{
+			self.weapon = IT_AXE;
+		}
+		else if (self.weapon == IT_AXE)
+		{
+			self.weapon = IT_LIGHTNING;
+			if (self.ammo_cells < 1)
+				am = 1;
+		}
+	
+		if ( (it & self.weapon) && am == 0)
 		{
 			W_SetCurrentAmmo ();
 			return;
@@ -1169,6 +1238,8 @@ void() ImpulseCommands =
 		CycleWeaponCommand ();
 	if (self.impulse == 11)
 		ServerflagsCommand ();
+	if (self.impulse == 12)
+		CycleWeaponReverseCommand ();
 
 	if (self.impulse == 255)
 		QuadCheat ();

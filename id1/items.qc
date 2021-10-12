@@ -638,7 +638,7 @@ local float		best;
 //	cells
 	if (self.weapon == 4)
 	{
-		if (other.ammo_cells >= 200)
+		if (other.ammo_cells >= 100)
 			return;
 		other.ammo_cells = other.ammo_cells + self.aflag;
 	}
@@ -674,7 +674,6 @@ local float		best;
 	self.solid = SOLID_NOT;
 	if (deathmatch == 1)
 		self.nextthink = time + 30;
-	
 	self.think = SUB_regen;
 
 	activator = other;
@@ -1230,14 +1229,26 @@ PLAYER BACKPACKS
 void() BackpackTouch =
 {
 	local string	s;
-	local	float	best;
+	local	float	best, old, new;
 	local		entity	stemp;
+	local	float	acount;
 	
 	if (other.classname != "player")
 		return;
 	if (other.health <= 0)
 		return;
-		
+
+	acount = 0;
+	sprint (other, "You get ");
+
+	if (self.items)
+		if ((other.items & self.items) == 0)
+		{
+			acount = 1;
+			sprint (other, "the ");
+			sprint (other, self.netname);
+		}
+
 // if the player was using his best weapon, change up to the new one if better		
 	stemp = self;
 	self = other;
@@ -1250,35 +1261,49 @@ void() BackpackTouch =
 	other.ammo_rockets = other.ammo_rockets + self.ammo_rockets;
 	other.ammo_cells = other.ammo_cells + self.ammo_cells;
 
-	other.items = other.items | self.items;
+	new = self.items;
+	if (!new)
+		new = other.weapon;
+	old = other.items;
+	other.items = other.items | new;
 	
 	bound_other_ammo ();
 
-	sprint (other, "You get ");
-
 	if (self.ammo_shells)
 	{
+		if (acount)
+			sprint(other, ", ");
+		acount = 1;
 		s = ftos(self.ammo_shells);
 		sprint (other, s);
-		sprint (other, " shells  ");
+		sprint (other, " shells");
 	}
 	if (self.ammo_nails)
 	{
+		if (acount)
+			sprint(other, ", ");
+		acount = 1;
 		s = ftos(self.ammo_nails);
 		sprint (other, s);
-		sprint (other, " nails ");
+		sprint (other, " nails");
 	}
 	if (self.ammo_rockets)
 	{
+		if (acount)
+			sprint(other, ", ");
+		acount = 1;
 		s = ftos(self.ammo_rockets);
 		sprint (other, s);
-		sprint (other, " rockets  ");
+		sprint (other, " rockets");
 	}
 	if (self.ammo_cells)
 	{
+		if (acount)
+			sprint(other, ", ");
+		acount = 1;
 		s = ftos(self.ammo_cells);
 		sprint (other, s);
-		sprint (other, " cells  ");
+		sprint (other, " cells");
 	}
 	
 	sprint (other, "\n");
@@ -1286,19 +1311,16 @@ void() BackpackTouch =
 	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
 
-// change to a better weapon if appropriate
-	if ( other.weapon == best )
-	{
-		stemp = self;
-		self = other;
-		self.weapon = W_BestWeapon();
-		self = stemp;
-	}
-
-	
+// remove the backpack, change self to the player
 	remove(self);
-	
 	self = other;
+
+// change to the weapon
+	if (!deathmatch)
+		self.weapon = new;
+	else
+		Deathmatch_Weapon (old, new);
+
 	W_SetCurrentAmmo ();
 };
 
@@ -1318,6 +1340,24 @@ void() DropBackpack =
 	item.origin = self.origin - '0 0 24';
 	
 	item.items = self.weapon;
+	if (item.items == IT_AXE)
+		item.netname = "Axe";
+	else if (item.items == IT_SHOTGUN)
+		item.netname = "Shotgun";
+	else if (item.items == IT_SUPER_SHOTGUN)
+		item.netname = "Double-barrelled Shotgun";
+	else if (item.items == IT_NAILGUN)
+		item.netname = "Nailgun";
+	else if (item.items == IT_SUPER_NAILGUN)
+		item.netname = "Super Nailgun";
+	else if (item.items == IT_GRENADE_LAUNCHER)
+		item.netname = "Grenade Launcher";
+	else if (item.items == IT_ROCKET_LAUNCHER)
+		item.netname = "Rocket Launcher";
+	else if (item.items == IT_LIGHTNING)
+		item.netname = "Thunderbolt";
+	else
+		item.netname = "";
 
 	item.ammo_shells = self.ammo_shells;
 	item.ammo_nails = self.ammo_nails;
