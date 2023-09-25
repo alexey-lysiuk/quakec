@@ -7,3 +7,6 @@
 [submodule "copper"]
 	path = copper
 	url = https://github.com/itslunaranyo/copper.git
+[submodule "alkaline"]
+	path = alkaline
+	url = https://github.com/fabiolimamp/alkaline.git
