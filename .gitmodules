@@ -10,3 +10,6 @@
 [submodule "alkaline"]
 	path = alkaline
 	url = https://github.com/fabiolimamp/alkaline.git
+[submodule "progs_dump"]
+	path = progs_dump
+	url = https://github.com/dumptruckDS/progs_dump_qc.git
