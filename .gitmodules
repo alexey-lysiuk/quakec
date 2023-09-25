@@ -1,3 +1,6 @@
 [submodule "rerelease"]
 	path = rerelease
 	url = https://github.com/id-Software/quake-rerelease-qc.git
+[submodule "ad"]
+	path = ad
+	url = https://github.com/SimsOCallaghan/ArcaneDimensions.git
