@@ -1,0 +1,3 @@
+[submodule "rerelease"]
+	path = rerelease
+	url = https://github.com/id-Software/quake-rerelease-qc.git
