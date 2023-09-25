@@ -4,3 +4,6 @@
 [submodule "ad"]
 	path = ad
 	url = https://github.com/SimsOCallaghan/ArcaneDimensions.git
+[submodule "copper"]
+	path = copper
+	url = https://github.com/itslunaranyo/copper.git
