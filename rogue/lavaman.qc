@@ -98,9 +98,9 @@ void(float dist) lavaman_walk =
 */
 
 void() lavaman_rise1	=[	$rise1, lavaman_rise2 ] 
-	{ sound (self, CHAN_WEAPON, "boss1/out1.wav", 1, ATTN_NORM);};
+	{ sound (self, CHAN_WEAPON, "boss1/out1.wav", 1, ATTN_NORM); };
 void() lavaman_rise2	=[	$rise2, lavaman_rise3 ] 
-	{sound (self, CHAN_VOICE, "boss1/sight1.wav", 1, ATTN_NORM); };
+	{ sound (self, CHAN_VOICE, "boss1/sight1.wav", 1, ATTN_NORM); };
 void() lavaman_rise3	=[	$rise3, lavaman_rise4 ] {};
 void() lavaman_rise4	=[	$rise4, lavaman_rise5 ] {};
 void() lavaman_rise5	=[	$rise5, lavaman_rise6 ] {};
@@ -276,7 +276,7 @@ void() lavaman_pain =
 };
 
 void() lavaman_death1 = [$death1, lavaman_death2] 
-	{sound (self, CHAN_VOICE, "boss1/death.wav", 1, ATTN_NORM);};
+	{ sound (self, CHAN_VOICE, "boss1/death.wav", 1, ATTN_NORM); };
 void() lavaman_death2 = [$death2, lavaman_death3] {};
 void() lavaman_death3 = [$death3, lavaman_death4] {};
 void() lavaman_death4 = [$death4, lavaman_death5] {};
@@ -413,7 +413,7 @@ void() lavaman_awake =
 	self.view_ofs = '0 0 48';
 
 //    self.health = 1500;
-	self.health = 1250 + (250 * cvar("skill"));
+	self.health = 1250 + (250 * cvar("skill"));
 
 	self.th_stand = lavaman_idle1;
 	self.th_walk = lavaman_walk1;

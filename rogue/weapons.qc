@@ -839,7 +839,7 @@ void() W_SetCurrentAmmo =
 		self.items2 = self.items2 | IT2_MULTI_ROCKETS;
 	}
 	else if (self.weapon == IT_MULTI_ROCKET)
-	{			
+	{
 		self.currentammo = self.ammo_multi_rockets;
 		self.weaponmodel = "progs/v_multi2.mdl";
 		self.weaponframe = 0;
@@ -892,7 +892,7 @@ void() W_SetCurrentAmmo =
 		self.currentammo = 0;
 		self.weaponmodel = "";
 		self.weaponframe = 0;
-	}		
+	}
 	UpdateAmmoCounts(self);
 };
 
@@ -1311,7 +1311,7 @@ void() CheatCommand =
 		IT_SUPER_NAILGUN |
 		IT_GRENADE_LAUNCHER |
 		IT_ROCKET_LAUNCHER |
-		IT_LAVA_NAILGUN | 
+		IT_LAVA_NAILGUN | 
 		IT_LAVA_SUPER_NAILGUN | 
 		IT_MULTI_GRENADE |
 		IT_MULTI_ROCKET | 

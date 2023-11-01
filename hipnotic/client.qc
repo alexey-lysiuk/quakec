@@ -1133,7 +1133,7 @@ void() PlayerPreThink =
                }
             }
          }
-     }
+     }
 
 	if (self.waterlevel == 2)
 		CheckWaterJump ();

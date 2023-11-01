@@ -412,7 +412,7 @@ void() dragon_fireball =
 	local float 	fireType;
 	
 	sound (self, CHAN_VOICE, "dragon/attack.wav", 1, ATTN_NORM);
-	makevectors (self.angles);
+	makevectors (self.angles);
     org = self.origin + v_forward*112 + v_up*32;
 
 	if (random() > 0.66)
@@ -426,7 +426,7 @@ void() dragon_fireball =
 	{
 		fireType = FIRE_FIREBALL;
 	    fireCount = random() * skill;			// easy 0, med 0-1, hard 0-2	
-   		fireCount = rint ( fireCount ) + 1;	// easy 1, med 1-2, hard 1-3
+   		fireCount = rint ( fireCount ) + 1; 	// easy 1, med 1-2, hard 1-3
 	}
 		
 	while (fireCount > 0)
@@ -509,7 +509,7 @@ void() dragon_melee9=[$drgslh09, dragon_melee10] { dragon_move(12);};
 void() dragon_melee10=[$drgslh10, dragon_melee11] { dragon_tail();};
 void() dragon_melee11=[$drgslh11, dragon_melee12] { dragon_move(10);};
 void() dragon_melee12=[$drgslh12, dragon_melee13] { dragon_move(10);};
-void() dragon_melee13=[$drgslh13, dragon_walk1 ] { dragon_move(10);};
+void() dragon_melee13=[$drgslh13, dragon_walk1 ] { dragon_move(10);};
 
 // ===================================
 // pain
@@ -769,7 +769,7 @@ void() monster_dragon =
 	self.th_run = dragon_walk1;
 	self.th_pain = dragon_pain;
 	self.th_die = dragon_death1;
-	self.dragonPainSequence=1;
+	self.dragonPainSequence=1;
 
 	total_monsters = total_monsters + 1;
 	self.nextthink = self.nextthink + 0.1;
@@ -777,7 +777,7 @@ void() monster_dragon =
 };
 
 // =================================================
-// dragon trigger-- OBSOLETE!!
+// dragon trigger -- OBSOLETE!!
 // =================================================
 
 /*QUAKED trigger_dragon (.5 .5 .5) ? A B C

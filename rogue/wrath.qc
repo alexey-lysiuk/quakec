@@ -221,7 +221,7 @@ void() monster_wrath =
 	self.movetype = MOVETYPE_STEP;
 	
 	setmodel (self, "progs/wrath.mdl");
-	setsize (self, VEC_HULL_MIN, VEC_HULL_MAX);
+	setsize (self, VEC_HULL_MIN, VEC_HULL_MAX);
 
 	self.health = 400;
 	self.yaw_speed = 35;
@@ -256,7 +256,7 @@ void(float AttackNumber) WrathMissile =
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
 	makevectors (self.angles);
-	missile = spawn ();
+	missile = spawn ();
 	missile.owner = self;
 	missile.solid = SOLID_BBOX;
 	missile.movetype = MOVETYPE_FLYMISSILE;
@@ -274,7 +274,7 @@ void(float AttackNumber) WrathMissile =
 	}
 	else if ( AttackNumber == 3)
 	{
-		org = self.origin + v_forward*12 + v_up*12 + v_right*20;// up20
+		org = self.origin + v_forward*12 + v_up*12 + v_right*20; // up20
 	}
     else if ( AttackNumber == 4)
 	{
@@ -317,7 +317,7 @@ void() WrathMissileTouch =
 	{
 		remove(self);
 		return;		// don't explode on any wraths
-	}
+	}
 
 	if (other.classname == "monster_zombie")
 		T_Damage (other, self, self, 110);	

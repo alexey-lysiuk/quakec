@@ -103,7 +103,7 @@ void() item_random_powerup =
 	precache_sound ("items/damage2.wav");
 	precache_sound ("items/damage3.wav");
 
-	precache_sound ("belt/pickup.wav");
+	precache_sound ("belt/pickup.wav");
 	precache_sound ("belt/use.wav");
 	precache_sound ("belt/fadeout.wav");
 	precache_sound ("shield/pickup.wav");

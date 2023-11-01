@@ -26,11 +26,11 @@ $frame s_wtba06 s_wtba07 s_wtba08 s_wtba09 s_wtba10 s_wtba11 s_wtba12
 
 // pain
 $frame s_wtpa01 s_wtpa02 s_wtpa03 s_wtpa04 s_wtpa05
-$frame s_wtpa06 s_wtpa07s_wtpa08 s_wtpa09 s_wtpa10
+$frame s_wtpa06 s_wtpa07 s_wtpa08 s_wtpa09 s_wtpa10
 $frame s_wtpa11 s_wtpa12 s_wtpa13 s_wtpa14
 
 $frame s_wtpb01 s_wtpb02 s_wtpb03 s_wtpb04 s_wtpb05
-$frame s_wtpb06 s_wtpb07s_wtpb08 s_wtpb09 s_wtpb10
+$frame s_wtpb06 s_wtpb07 s_wtpb08 s_wtpb09 s_wtpb10
 $frame s_wtpb11 
 
 // death
@@ -281,7 +281,7 @@ void()	overlord_at_c13 =[	$s_wtac13,	overlord_at_c14 ] { ai_charge(12);};
 void()	overlord_at_c14 =[	$s_wtac14,	overlord_run01 ] { ai_charge(12);};
 
 void() overlord_smash =
-{	
+{
 	local vector	delta;
 	local float		smashDmg;
 	
@@ -504,9 +504,9 @@ void() monster_super_wrath =
 		return;
 	}
 	precache_model ("progs/s_wrath.mdl");
-//	precache_model ("progs/s_wrtgb1.mdl");
-	precache_model ("progs/s_wrtgb2.mdl");
-	precache_model ("progs/s_wrtgb3.mdl");
+//	precache_model ("progs/s_wrtgb1.mdl");
+	precache_model ("progs/s_wrtgb2.mdl");
+	precache_model ("progs/s_wrtgb3.mdl");
 	precache_model ("progs/wrthgib1.mdl");
 	precache_model ("progs/wrthgib2.mdl");
 	precache_model ("progs/wrthgib3.mdl");
@@ -522,7 +522,7 @@ void() monster_super_wrath =
     self.movetype = MOVETYPE_STEP;
 	
 	setmodel (self, "progs/s_wrath.mdl");
-	setsize (self, VEC_HULL_MIN, VEC_HULL_MAX);
+	setsize (self, VEC_HULL_MIN, VEC_HULL_MAX);
 
 	self.health = 1000;
 	self.pain_finished = 0;

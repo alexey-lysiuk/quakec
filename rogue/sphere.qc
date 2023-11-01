@@ -156,4 +156,4 @@ void() item_sphere =
     setsize (self, '-8 -8 -8', '8 8 8');
 	self.avelocity = '40 40 40';
 	StartItem ();
-};
+};

@@ -69,29 +69,29 @@ void() morph_walk2  = [ $mfwlk02, morph_walk3  ] {ai_walk(2);};
 void() morph_walk3  = [ $mfwlk03, morph_walk4  ] {ai_walk(4);};
 void() morph_walk4  = [ $mfwlk04, morph_walk5  ] {ai_walk(5);};
 void() morph_walk5  = [ $mfwlk05, morph_walk6  ] {ai_walk(5);};
-void() morph_walk6  = [ $mfwlk06, morph_walk7  ] {ai_walk(4);}; //1
-void() morph_walk7  = [ $mfwlk07, morph_walk8  ] {ai_walk(2);}; //1 
+void() morph_walk6  = [ $mfwlk06, morph_walk7  ] {ai_walk(4);}; //1
+void() morph_walk7  = [ $mfwlk07, morph_walk8  ] {ai_walk(2);}; //1 
 void() morph_walk8  = [ $mfwlk08, morph_walk9  ] {ai_walk(3);};
 void() morph_walk9  = [ $mfwlk09, morph_walk10 ] {ai_walk(4);};
 void() morph_walk10 = [ $mfwlk10, morph_walk11 ] {ai_walk(5);};
 void() morph_walk11 = [ $mfwlk11, morph_walk12 ] {ai_walk(5);};
 void() morph_walk12 = [ $mfwlk12, morph_walk13 ] {ai_walk(4);};
-void() morph_walk13 = [ $mfwlk13, morph_walk1  ] {ai_walk(3);}; // 1
+void() morph_walk13 = [ $mfwlk13, morph_walk1  ] {ai_walk(3);}; // 1
 
 // 8 6 4 10 13 13 11 10
 // 11 15 10 10 8 15 10 8 8 8 8
 // 6 9 13 13 9 6 9 13 15 13 9
-void() morph_run1 = [ $mfrun01, morph_run2 ] { ai_run( 7);};	// 33
+void() morph_run1 = [ $mfrun01, morph_run2 ] { ai_run( 7);};	// 33
 void() morph_run2 = [ $mfrun02, morph_run3 ] { ai_run(11);};
 void() morph_run3 = [ $mfrun03, morph_run4 ] { ai_run(16);};
-void() morph_run4 = [ $mfrun04, morph_run5 ] { ai_run(16);};	// 36
+void() morph_run4 = [ $mfrun04, morph_run5 ] { ai_run(16);};	// 36
 void() morph_run5 = [ $mfrun05, morph_run6 ] { ai_run(11);};
-void() morph_run6 = [ $mfrun06, morph_run7 ] { ai_run( 7);};	// 38
+void() morph_run6 = [ $mfrun06, morph_run7 ] { ai_run( 7);};	// 38
 void() morph_run7 = [ $mfrun07, morph_run8 ] { ai_run(11);};
-void() morph_run8 = [ $mfrun08, morph_run9 ] { ai_run(15);};	// 40
-void() morph_run9 = [ $mfrun09, morph_run10 ] {ai_run(19);};		
-void() morph_run10 =[ $mfrun10, morph_run11 ] {ai_run(15);};		
-void() morph_run11 =[ $mfrun11, morph_run1 ] { ai_run(11);};	// 43
+void() morph_run8 = [ $mfrun08, morph_run9 ] { ai_run(15);};	// 40
+void() morph_run9 = [ $mfrun09, morph_run10 ] {ai_run(19);};		
+void() morph_run10 =[ $mfrun10, morph_run11 ] {ai_run(15);};		
+void() morph_run11 =[ $mfrun11, morph_run1 ] { ai_run(11);};	// 43
 
 // ========================
 // new attack code
@@ -362,7 +362,7 @@ void() morph_wake1 = [ $start01, morph_wake2 ]
 //		self.solid = SOLID_SLIDEBOX;
 //		self.takedamage = DAMAGE_NO;
 
-		total_monsters = total_monsters + 1;  
+		total_monsters = total_monsters + 1;
 		self.owner.childrenSpawned = self.owner.childrenSpawned + 1;
 		
 		WriteByte (MSG_BROADCAST, SVC_UPDATESTAT);
@@ -425,8 +425,8 @@ void(entity theMorph) morph_setup =
 	theMorph.view_ofs = '0 0 25';
 	theMorph.frame = $start01;
 
-	setmodel (theMorph, theMorph.model);
-	setsize (theMorph, VEC_HULL_MIN, VEC_HULL_MAX);
+	setmodel (theMorph, theMorph.model);
+	setsize (theMorph, VEC_HULL_MIN, VEC_HULL_MAX);
 
 	theMorph.th_stand = morph_stand1;
 	theMorph.th_walk = morph_walk1;
@@ -535,7 +535,7 @@ void() monster_morph =
 		precache_model ("progs/morph_az.mdl");
 		self.model = "progs/morph_az.mdl";
 	}
-	else if (self.spawnflags & MORPH_EGYPT)	// Egyptian
+	else if (self.spawnflags & MORPH_EGYPT)	// Egyptian
 	{
 		precache_model ("progs/morph_eg.mdl");
 		self.model = "progs/morph_eg.mdl";

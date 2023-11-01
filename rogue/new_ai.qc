@@ -91,7 +91,7 @@ void(entity destEnt, float trackSpeed) ai_track =
 void(string gibname, float dm) AccelerateGib =
 {
 	local entity	new;
-	local float		offset1;
+	local float		offset1;
 
 	new = spawn();
 	new.origin = self.origin;
