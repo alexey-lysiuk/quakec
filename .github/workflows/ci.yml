@@ -1,0 +1,61 @@
+name: Continuous Integration
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Compile QuakeC code
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout QuakeC code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Compile FTEQCC
+        run: |
+          mkdir fteqcc
+
+          # See https://www.fteqcc.org/ for commit hash
+          COMMIT=3adec5d0a53ba9ae32a92fc0a805cf6d5ec107fb
+
+          cd fteqcc
+          wget -q https://github.com/fte-team/fteqw/archive/$COMMIT.zip
+          unzip -q $COMMIT.zip
+
+          cd fteqw-$COMMIT
+          cmake -DCMAKE_BUILD_TYPE=Release .
+          cmake --build . --target fteqcc --parallel 3
+          cp fteqcc ..
+
+      - name: Compile QuakeC code
+        shell: bash
+        run: |
+          PROJECTS=(
+            ad
+            alkaline
+            copper
+            hipnotic
+            id1
+            progs_dump
+            rerelease/quakec
+            rerelease/quakec_ctf
+            rerelease/quakec_hipnotic
+            rerelease/quakec_mg1
+            rerelease/quakec_rogue
+            rogue
+          )
+
+          for project in ${PROJECTS[@]}; do
+            echo ::group::$project
+            ./fteqcc/fteqcc -src $project
+            echo ::endgroup::
+          done
+
+      - name: List Directories
+        if: always()
+        shell: bash
+        run: |
+          git status
+          ls -lR
