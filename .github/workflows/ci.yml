@@ -45,6 +45,7 @@ jobs:
             rerelease/quakec_mg1
             rerelease/quakec_rogue
             rogue
+            smp
           )
 
           for project in ${PROJECTS[@]}; do

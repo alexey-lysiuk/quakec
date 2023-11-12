@@ -13,3 +13,6 @@
 [submodule "progs_dump"]
 	path = progs_dump
 	url = https://github.com/dumptruckDS/progs_dump_qc.git
+[submodule "smp"]
+	path = smp
+	url = https://github.com/quake-mapping-community/smp.git
