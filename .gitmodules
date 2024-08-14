@@ -16,3 +16,6 @@
 [submodule "smp"]
 	path = smp
 	url = https://github.com/quake-mapping-community/smp.git
+[submodule "remobilize"]
+	path = remobilize
+	url = https://github.com/EmeraldTiger/Re-Mobilize.git
