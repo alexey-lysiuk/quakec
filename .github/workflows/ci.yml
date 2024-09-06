@@ -30,7 +30,6 @@ jobs:
             progs_dump
             remobilize
             rerelease/quakec
-            rerelease/quakec_ctf
             rerelease/quakec_hipnotic
             rerelease/quakec_mg1
             rerelease/quakec_rogue
