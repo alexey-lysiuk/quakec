@@ -43,6 +43,12 @@ jobs:
             echo ::endgroup::
           done
 
+          # Special case to avoid compilation error in drake/thor.qc
+          # where 'static' keyword is used as variable name
+          echo ::group::drake
+            ./fteqcc64 -src drake -Kno-static
+          echo ::endgroup::
+
       - name: List Directories
         if: always()
         shell: bash
