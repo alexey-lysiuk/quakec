@@ -13,21 +13,10 @@ jobs:
         with:
           submodules: true
 
-      - name: Compile FTEQCC
+      - name: Download FTEQCC
         run: |
-          mkdir fteqcc
-
-          # See https://www.fteqcc.org/ for commit hash
-          COMMIT=3adec5d0a53ba9ae32a92fc0a805cf6d5ec107fb
-
-          cd fteqcc
-          wget -q https://github.com/fte-team/fteqw/archive/$COMMIT.zip
-          unzip -q $COMMIT.zip
-
-          cd fteqw-$COMMIT
-          cmake -DCMAKE_BUILD_TYPE=Release .
-          cmake --build . --target fteqcc --parallel 3
-          cp fteqcc ..
+          wget -q https://www.fteqcc.org/dl/fteqcc_linux64.zip
+          unzip fteqcc_linux64.zip
 
       - name: Compile QuakeC code
         shell: bash
@@ -51,7 +40,7 @@ jobs:
 
           for project in ${PROJECTS[@]}; do
             echo ::group::$project
-            ./fteqcc/fteqcc -src $project
+            ./fteqcc64 -src $project
             echo ::endgroup::
           done
 
