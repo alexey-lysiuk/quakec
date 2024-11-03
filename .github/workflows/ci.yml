@@ -16,7 +16,7 @@ jobs:
       - name: Download FTEQCC
         run: |
           wget -q https://www.fteqcc.org/dl/fteqcc_linux64.zip
-          unzip fteqcc_linux64.zip
+          unzip fteqcc_linux64.zip fteqcc64
 
       - name: Compile QuakeC code
         shell: bash
