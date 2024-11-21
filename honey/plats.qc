@@ -147,8 +147,6 @@ Set "sounds" to one of the following:
 void() func_plat =
 
 {
-local entity t;
-
 	if (!self.t_length)
 		self.t_length = 80;
 	if (!self.t_width)
@@ -156,7 +154,6 @@ local entity t;
 
 	if (self.sounds == 0)
 		self.sounds = 2;
-// FIX THIS TO LOAD A GENERIC PLAT SOUND
 
 	if (self.sounds == 1)
 	{

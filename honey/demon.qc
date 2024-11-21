@@ -336,9 +336,7 @@ float()	CheckDemonJump =
 
 float()	DemonCheckAttack =
 {
-	local	vector	vec;
-	
-// if close enough for slashing, go for it
+	// if close enough for slashing, go for it
 	if (CheckDemonMelee ())
 	{
 		self.attack_state = AS_MELEE;

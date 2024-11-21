@@ -60,6 +60,12 @@ float() CheckAttack =
 	local entity	targ;
 	local float		chance;
 
+
+	if(self.spawnflags & MISSILE_RANDOM)
+	{
+		if(self.flags & FL_ONGROUND) return TRUE;
+	}
+
 	targ = self.enemy;
 	
 // see if any entities are in the way of the shot

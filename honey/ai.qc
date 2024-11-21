@@ -34,7 +34,6 @@ walkmove(angle, speed) primitive is all or nothing
 //
 // globals
 //
-float	current_yaw;
 //float	wtf;
 
 //
@@ -251,8 +250,10 @@ float (entity client) visible =
 	spot1 = self.origin + self.view_ofs;
 	spot2 = client.origin + client.view_ofs;
 	
-	if(self.spawnflags & SF_AI_BBOX_CHECK) 	return bbox_visible(self, spot2);
-	else									return point_visible(spot1, spot2);
+	if(self.spawnflags & SF_AI_BBOX_CHECK) 	
+		return bbox_visible(self, spot2);
+	else									
+		return point_visible(spot1, spot2);
 }
 
 /*
@@ -589,8 +590,6 @@ The monster is walking it's beat
 */
 void(float dist) ai_walk =
 {
-	local vector		mtemp;
-	
 	movedist = dist;
 	
 	// check for noticing a player
@@ -743,7 +742,14 @@ Turn in place until within an angle to launch a missile attack
 */
 void() ai_run_missile =
 {
-	self.ideal_yaw = enemy_yaw;
+	if(self.spawnflags & MISSILE_RANDOM)
+	{
+		self.ideal_yaw = random() * 360;
+	}
+	else
+	{
+		self.ideal_yaw = enemy_yaw;
+	}
 	ChangeYaw ();
 	if (FacingIdeal())
 	{
@@ -789,10 +795,6 @@ The monster has an enemy it is trying to kill
 */
 void(float dist) ai_run =
 {
-	local	vector	delta;
-	local	float	axis;
-	local	float	direct, ang_rint, ang_floor, ang_ceil;
-	
 	movedist = dist;
 // see if the enemy is dead
 	if (self.enemy.health <= 0)

@@ -587,7 +587,7 @@ void() monster_ogre =
 void() ogre_spawncrown;
 void() monster_ogre_marksman =
 {
-	self.wad = "progs/mogre.mdl";
+	self.wad = "progs/ogre.mdl";
 	precache_model("progs/s_light2.spr");
 	monster_ogre_real();
 };
@@ -645,7 +645,7 @@ void() ogre_spawncrown =
 
 void() ogre_crown_die =
 {
-	entity tf,oself;
+	entity tf;
 	tf = self.trigger_field;
 	if(tf == world) return;
 

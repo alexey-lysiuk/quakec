@@ -1,7 +1,5 @@
 
 
-void(entity t) D_SK_debugSpline;
-
 //Does a shitty modulo operation.
 float(float v, float m) mod = 
 {
@@ -69,251 +67,6 @@ vector (vector from, vector to, float fraction) tween_v_sq =
 	return res;
 }
 
-
-/*
-=============
-stuffcmd_float
-
-This is a horrible hack that I am ashamed of!
-===============
-*/
-void stuffcmd_digit( entity client, float f) =
-{
-	float d;
-	d = floor(f);
-	d = mod(d, 10);
-
-	//CLOSE YOUR EYES, HONEY! DON'T LOOK!
-	if(d == 0)
-		stuffcmd(client, "0");
-	else if(d == 1)
-		stuffcmd(client, "1");
-	else if(d == 2)
-		stuffcmd(client, "2");
-	else if(d == 3)
-		stuffcmd(client, "3");
-	else if(d == 4)
-		stuffcmd(client, "4");
-	else if(d == 5)
-		stuffcmd(client, "5");
-	else if(d == 6)
-		stuffcmd(client, "6");
-	else if(d == 7)
-		stuffcmd(client, "7");
-	else if(d == 8)
-		stuffcmd(client, "8");
-	else if(d == 9)
-		stuffcmd(client, "9");	
-}
-
-void stuffcmd_int( entity client, float f, float numdigits) =
-{
-	
-	float tmp;
-
-	
-	if(f == 0){
-		stuffcmd( client, "0");
-		return;
-	}
-
-	if(f < 0){
-		// Yeah sure.
-		stuffcmd( client, "-");
-		f = fabs(f);
-	}
-	
-	if(numdigits <= 0){
-		tmp = f;
-		numdigits = 1;
-		while(tmp >= 1){
-			tmp = tmp / 10;
-			numdigits = numdigits * 10;
-		}
-	}
-	
-	//I don't know what I'm thinking here...
-	//I need to do this to get zero-padding to work.
-
-	while( numdigits > 1 ){
-		
-		numdigits = numdigits / 10;
-		tmp = f / numdigits;
-		stuffcmd_digit( client, tmp);
-		
-	}
-	
-	
-}
-
-void stuffcmd_float( entity client, float f) =
-{
-	float intpart, decpart, mul, isNegative;
-	
-	isNegative = FALSE;
-	
-	if(f == 0){
-		stuffcmd( client, "0");
-		return;
-	}
-	
-	if(f < 0){
-		// easier this way
-		isNegative = TRUE;
-		f = fabs(f);
-	}
-	
-	
-	// 1: stuff the integer part.
-	intpart = floor(f);
-	if(isNegative) 
-		stuffcmd( client, "-");
-	stuffcmd_int( client, intpart, 0);
-	
-	
-	// 2: stuff the decimal point.
-	stuffcmd( client, ".");
-	
-	
-	// 3: stuff the decimal part.
-	decpart = mod( f, 1);
-	decpart = decpart * 10000;
-	stuffcmd_int( client, decpart, 10000);
-
-}
-
-/*
-=============
-dprint_float
-
-This is a horrible hack that I am ashamed of!
-===============
-*/
-void dprint_digit(float f) =
-{
-	float d;
-	d = floor(f);
-	d = mod(d, 10);
-
-	//CLOSE YOUR EYES, HONEY! DON'T LOOK!
-	if(d == 0)
-		dprint("0");
-	else if(d == 1)
-		dprint("1");
-	else if(d == 2)
-		dprint("2");
-	else if(d == 3)
-		dprint("3");
-	else if(d == 4)
-		dprint("4");
-	else if(d == 5)
-		dprint("5");
-	else if(d == 6)
-		dprint("6");
-	else if(d == 7)
-		dprint("7");
-	else if(d == 8)
-		dprint("8");
-	else if(d == 9)
-		dprint("9");	
-}
-
-void dprint_int( float f, float numdigits) =
-{
-	
-	float tmp;
-
-	
-	if(f == 0){
-		dprint("0");
-		return;
-	}
-
-	if(f < 0){
-		// Yeah sure.
-		dprint("-");
-		f = fabs(f);
-	}
-	
-	if(numdigits <= 0){
-		tmp = f;
-		numdigits = 1;
-		while(tmp >= 1){
-			tmp = tmp / 10;
-			numdigits = numdigits * 10;
-		}
-	}
-	
-	//I don't know what I'm thinking here...
-	//I need to do this to get zero-padding to work.
-
-	while( numdigits > 1 ){
-		
-		numdigits = numdigits / 10;
-		tmp = f / numdigits;
-		dprint_digit(tmp);
-		
-	}
-	
-	
-}
-
-void dprint_float( float f) =
-{
-	float intpart, decpart, mul, isNegative;
-	
-	isNegative = FALSE;
-	
-	if(f == 0){
-		dprint( "0");
-		return;
-	}
-	
-	if(f < 0){
-		// easier this way
-		isNegative = TRUE;
-		f = fabs(f);
-	}
-	
-	
-	// 1: stuff the integer part.
-	intpart = floor(f);
-	if(isNegative) 
-		dprint( "-");
-	dprint_int( intpart, 0);
-	
-	
-	// 2: stuff the decimal point.
-	dprint( ".");
-	
-	
-	// 3: stuff the decimal part.
-	decpart = mod( f, 1);
-	decpart = decpart * 10000;
-	dprint_int( decpart, 10000);
-
-}
-
-void dprint_str_f_str(string s1,  float f, string s2) =
-{
-	dprint(s1);
-	dprint_float(f);
-	dprint(s2);
-}
-
-void dprint_str_v_str(string s1,  vector v, string s2) =
-{
-	dprint(s1);
-	dprint("[");
-	dprint_float(v_x);
-	dprint(", ");
-	dprint_float(v_y);
-	dprint(", ");
-	dprint_float(v_z);
-	dprint("]");
-	dprint(s2);
-}
-
 /*
 =============
 SUB_RotatePoint
@@ -325,9 +78,6 @@ vector(vector point, vector toAngles) SUB_RotatePoint =
 {
 	local vector ang, noZ;
 	local float oldZ;
-
-	dprint_str_v_str("rotating point ", point, " around angles");
-	dprint_str_v_str(" ", toAngles, "\n");
 
 	oldZ = point_z;
 	noZ = point;
@@ -341,7 +91,6 @@ vector(vector point, vector toAngles) SUB_RotatePoint =
 	noZ = v_forward * vlen(point);
 	noZ_z = oldZ;
 
-	dprint_str_v_str("Got ", noZ, "\n");
 	return noZ;
 	
 
@@ -503,17 +252,12 @@ void(vector tdest, float ttime, vector tangle, void() func) SUB_CalcMoveRotateTi
 	self.avelocity = adestdelta * (1 / ttime);
 	
 	
-	/*
-	if(vlen(self.avelocity) > 1000){
-
-//		dprint_str_v_str("Crazy high velocity! self.avelocity = ", self.avelocity, "\n)");
-//		dprint_str_v_str("Start angle = ", self.angles, "\n");
-//		dprint_str_v_str("Target angle = ", self.finalangle, "\n");
-//		dprint_str_v_str("Difference = ",adestdelta,"\n--------------------------------------\n\n");
-		
-		
-		
-	}//*/
+	// if(vlen(self.avelocity) > 1000){
+	// 	dprint_str_v_str("Crazy high velocity! self.avelocity = ", self.avelocity, "\n)");
+	// 	dprint_str_v_str("Start angle = ", self.angles, "\n");
+	// 	dprint_str_v_str("Target angle = ", self.finalangle, "\n");
+	// 	dprint_str_v_str("Difference = ",adestdelta,"\n--------------------------------------\n\n");
+	// }
 }
 
 void(vector tdest, float ttime, void() func) SUB_CalcMoveTime =
@@ -679,13 +423,6 @@ void(vector tdest, vector tangle, float ttime, float cpOffset, void() func) SUB_
 	
 	self.think = SUB_CalcMoveSplineTick_norotate;
 	SUB_CalcMoveSplineTick_norotate();
-}
-
-//USE CAREFULLY, SPAWNS LOTS OF ENTITIES!
-void(vector tdest, vector tangle, float ttime, float cpOffset, vector aOffset, void() func) SUB_CalcMoveSplineDEBUG =
-{	
-	SUB_CalcMoveSpline(tdest,tangle,ttime,cpOffset,aOffset,func);
-	D_SK_debugSpline(self);
 }
 
 vector() InterpolatePoint;

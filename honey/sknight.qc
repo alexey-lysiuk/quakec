@@ -154,7 +154,7 @@ void (vector offset) sknight_move_spears =
 /**********************************************************************************************/
 vector(vector center, vector ang) sknight_getNextSpearPos = 
 {
-	vector vx, vy, vz, org;
+	vector org, vx, vy;
 
 	makevectors (ang);
 
@@ -189,7 +189,7 @@ void() sknight_spears_orbit =
 
 void () sknight_star_attack_end_think =
 {
-	vector dir, ang, nOrg;
+	vector dir, ang;
 	
 	ang = self.angles;
 	//self.avelocity = '0 0 0';
@@ -234,10 +234,8 @@ void () sknight_star_attack_begin =
 void(entity sknight) sknight_setup_spears = 
 {
 	entity spear;
-	float spin;
-	vector ang, dOrg;
 	
-	dOrg = sknight.origin;
+	vector dOrg = sknight.origin;
 	
 	
 	float i;
@@ -336,7 +334,7 @@ void() monster_sknight =
 	self.th_run = hknight_run1;
 	self.th_melee = SUB_Null;
 	self.th_missile = hknight_magicc1;
-	self.th_pain = SUB_Null;
+	self.th_pain = SUB_NullPain;
 	self.th_die = hknight_die;
 	
 	self.state = SK_STATE_SLEEPING;

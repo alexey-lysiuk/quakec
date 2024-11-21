@@ -296,6 +296,7 @@ float	IT_GRENADE_LAUNCHER		= 16;
 float	IT_ROCKET_LAUNCHER		= 32;
 float	IT_LIGHTNING			= 64;
 float	IT_EXTRA_WEAPON			= 128;
+float	IT_ALL_WEAPONS 			= IT_AXE | IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_NAILGUN | IT_SUPER_NAILGUN | IT_GRENADE_LAUNCHER | IT_ROCKET_LAUNCHER | IT_LIGHTNING | IT_EXTRA_WEAPON ;
 
 float	IT_SHELLS				= 256;
 float	IT_NAILS				= 512;
@@ -350,6 +351,12 @@ float	SVC_CDTRACK			= 32;
 float	SVC_SELLSCREEN		= 33;
 float	SVC_CUTSCENE		= 34;
 float	SVC_UPDATESTAT		= 3;
+float	SVC_ACHIEVEMENT		= 52;
+
+float STAT_TOTALSECRETS	= 11;
+float STAT_TOTALMONSTERS = 12;
+float STAT_SECRETS = 13; // bumped on client side by svc_foundsecret
+float STAT_MONSTERS = 14;
 
 
 float	TE_SPIKE		= 0;
@@ -392,6 +399,10 @@ float	EF_BRIGHTFIELD		= 1;
 float	EF_MUZZLEFLASH 		= 2;
 float	EF_BRIGHTLIGHT 		= 4;
 float	EF_DIMLIGHT 		= 8;
+float	EF_QUADLIGHT 		= 16;
+float	EF_PENTLIGHT 		= 32;
+float	EF_CANDLELIGHT 		= 64;
+
 
 
 // messages
@@ -402,6 +413,7 @@ float	MSG_INIT		= 3;		// write to the init string
 
 
 //honey spawning flags
+float MISSILE_RANDOM = 4194304;
 float TBABY_HIPHOP = 2;
 float TBABY_LIVID = 4;
 float TRIGGER_SPAWN_TFOG = 8;
@@ -425,6 +437,8 @@ string ZOMBIE_ONGROUND = "ZOMBIE_ONGROUND";
 float	movedist;
 float	gameover;		// set when a rule exits
 
+var float num_players = 0;
+
 //float	actual_monster_total;
 
 //moved from client.qc
@@ -434,9 +448,7 @@ float	intermission_exittime;
 string 	nextmap;
 
 
-string	string_null;	// null string, nothing should be held here
-float	empty_float;
-
+nosave string string_null;	// null string, nothing should be held here
 
 entity	activator;		// the entity that activated a trigger or brush
 
@@ -634,8 +646,22 @@ string(string s) precache_sound		= #19;
 string(string s) precache_model		= #20;
 void(entity client, string s)stuffcmd = #21;
 entity(vector org, float rad) findradius = #22;
-void(string s) bprint				= #23;
-void(entity client, string s) sprint = #24;
+
+//Localized prints 
+void(string s) bprint			= #91;
+void(entity client, string s) sprint = #92;
+void(entity client, string s) centerprint = #90;	// sprint, but in middle
+void centerprint_all(string s)
+{
+	entity e = find(world, classname, "player");
+	while(e)
+	{
+		centerprint(e, s);
+		e = find(e, classname, "player");
+	}
+}
+
+
 void(string s) dprint				= #25;
 string(float f) ftos				= #26;
 string(vector v) vtos				= #27;
@@ -723,8 +749,6 @@ void(string s) changelevel = #70;
 
 void(string var, string val) cvar_set = #72;	// sets cvar.value
 
-void(entity client, string s) centerprint = #73;	// sprint, but in middle
-
 void(vector pos, string samp, float vol, float atten) ambientsound = #74;
 
 string(string s) precache_model2	= #75;		// registered version only
@@ -758,15 +782,5 @@ float(entity targ, entity inflictor, entity attacker, float damage) T_Damage;
 float (entity e, float healamount, float ignore) T_Heal; // health function
 
 float(entity targ, entity inflictor) CanDamage;
-
-
-vector fog_global_color;
-float  fog_global_density;
-void(float v) dprint_float;
-
-//comment/uncomment these to make the engine crash
-float	wtf;
-float	wtf2;
-float	wtf3;
 
 

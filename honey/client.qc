@@ -2,13 +2,13 @@
 // prototypes
 void () W_WeaponFrame;
 void() W_SetCurrentAmmo;
-void() player_pain;
+void(entity attacker, float damage) player_pain;
 void() player_stand1;
 void (vector org, entity death_owner) spawn_tdeath;
 
-void fog_setOverrideConditional(entity c, vector color, float density, float currentFraction);
-
 float	modelindex_eyes, modelindex_player;
+
+const float COOP_SPAWN_ACTIVE = 1;
 
 /*
 =============================================================================
@@ -82,8 +82,21 @@ void() SetNewParms =
 
 void() DecodeLevelParms =
 {
+	if(world.model == "maps/credits.bsp")
+	{
+		self.items = 0;
+		self.health = 100;
+		self.armorvalue = 0;
+		self.ammo_shells = 0;
+		self.ammo_nails = 0;
+		self.ammo_rockets = 0;
+		self.ammo_cells = 0;
+		self.weapon = 0;
+		self.armortype = 0;
+		return;
+	}
 
-	SetNewParms (); // Nah, let's always do this...
+	SetNewParms (); 
 	
 	self.items = parm1;
 	self.health = parm2;
@@ -146,6 +159,7 @@ void() GotoNextMap =
 		changelevel (nextmap);
 };
 
+string intermissiontext;
 void() ExitIntermission =
 {
 // skip any text in deathmatch
@@ -156,11 +170,7 @@ void() ExitIntermission =
 	}
 	
 	intermission_exittime = time + 1;
-
-	
-
 	intermission_running = intermission_running + 1;
-	
 
 //
 // run some text if at the end of an episode
@@ -169,53 +179,50 @@ void() ExitIntermission =
 	{
 		if (world.model == "maps/e1m7.bsp")
 		{
-			WriteByte (MSG_ALL, SVC_CDTRACK);
-			WriteByte (MSG_ALL, 2);
-			WriteByte (MSG_ALL, 3);
 			if (!cvar("registered"))
 			{
-				WriteByte (MSG_ALL, SVC_FINALE);
-				WriteString (MSG_ALL, "As the corpse of the monstrous entity\nChthon sinks back into the lava whence\nit rose, you grip the Rune of Earth\nMagic tightly. Now that you have\nconquered the Dimension of the Doomed,\nrealm of Earth Magic, you are ready to\ncomplete your task in the other three\nhaunted lands of Quake. Or are you? If\nyou don't register Quake, you'll never\nknow what awaits you in the Realm of\nBlack Magic, the Netherworld, and the\nElder World!");
+				intermissiontext = "As the corpse of the monstrous entity\nChthon sinks back into the lava whence\nit rose, you grip the Rune of Earth\nMagic tightly. Now that you have\nconquered the Dimension of the Doomed,\nrealm of Earth Magic, you are ready to\ncomplete your task in the other three\nhaunted lands of Quake. Or are you? If\nyou don't register Quake, you'll never\nknow what awaits you in the Realm of\nBlack Magic, the Netherworld, and the\nElder World!";
 			}
 			else
 			{
-				WriteByte (MSG_ALL, SVC_FINALE);
-				WriteString (MSG_ALL, "As the corpse of the monstrous entity\nChthon sinks back into the lava whence\nit rose, you grip the Rune of Earth\nMagic tightly. Now that you have\nconquered the Dimension of the Doomed,\nrealm of Earth Magic, you are ready to\ncomplete your task. A Rune of magic\npower lies at the end of each haunted\nland of Quake. Go forth, seek the\ntotality of the four Runes!");
+				intermissiontext = "As the corpse of the monstrous entity\nChthon sinks back into the lava whence\nit rose, you grip the Rune of Earth\nMagic tightly. Now that you have\nconquered the Dimension of the Doomed,\nrealm of Earth Magic, you are ready to\ncomplete your task. A Rune of magic\npower lies at the end of each haunted\nland of Quake. Go forth, seek the\ntotality of the four Runes!";
 			}
-			return;
 		}
 		else if (world.model == "maps/e2m6.bsp")
 		{
-			WriteByte (MSG_ALL, SVC_CDTRACK);
-			WriteByte (MSG_ALL, 2);
-			WriteByte (MSG_ALL, 3);
-
-			WriteByte (MSG_ALL, SVC_FINALE);
-			WriteString (MSG_ALL, "The Rune of Black Magic throbs evilly in\nyour hand and whispers dark thoughts\ninto your brain. You learn the inmost\nlore of the Hell-Mother; Shub-Niggurath!\nYou now know that she is behind all the\nterrible plotting which has led to so\nmuch death and horror. But she is not\ninviolate! Armed with this Rune, you\nrealize that once all four Runes are\ncombined, the gate to Shub-Niggurath's\nPit will open, and you can face the\nWitch-Goddess herself in her frightful\notherworld cathedral.");
-			return;
+			intermissiontext = "The Rune of Black Magic throbs evilly in\nyour hand and whispers dark thoughts\ninto your brain. You learn the inmost\nlore of the Hell-Mother; Shub-Niggurath!\nYou now know that she is behind all the\nterrible plotting which has led to so\nmuch death and horror. But she is not\ninviolate! Armed with this Rune, you\nrealize that once all four Runes are\ncombined, the gate to Shub-Niggurath's\nPit will open, and you can face the\nWitch-Goddess herself in her frightful\notherworld cathedral.";
 		}
 		else if (world.model == "maps/e3m6.bsp")
 		{
-			WriteByte (MSG_ALL, SVC_CDTRACK);
-			WriteByte (MSG_ALL, 2);
-			WriteByte (MSG_ALL, 3);
-
-			WriteByte (MSG_ALL, SVC_FINALE);
-			WriteString (MSG_ALL, "The charred viscera of diabolic horrors\nbubble viscously as you seize the Rune\nof Hell Magic. Its heat scorches your\nhand, and its terrible secrets blight\nyour mind. Gathering the shreds of your\ncourage, you shake the devil's shackles\nfrom your soul, and become ever more\nhard and determined to destroy the\nhideous creatures whose mere existence\nthreatens the souls and psyches of all\nthe population of Earth.");
-			return;
+			intermissiontext = "The charred viscera of diabolic horrors\nbubble viscously as you seize the Rune\nof Hell Magic. Its heat scorches your\nhand, and its terrible secrets blight\nyour mind. Gathering the shreds of your\ncourage, you shake the devil's shackles\nfrom your soul, and become ever more\nhard and determined to destroy the\nhideous creatures whose mere existence\nthreatens the souls and psyches of all\nthe population of Earth.";
 		}
 		else if (world.model == "maps/e4m7.bsp")
+		{
+			intermissiontext = "Despite the awful might of the Elder\nWorld, you have achieved the Rune of\nElder Magic, capstone of all types of\narcane wisdom. Beyond good and evil,\nbeyond life and death, the Rune\npulsates, heavy with import. Patient and\npotent, the Elder Being Shub-Niggurath\nweaves her dire plans to clear off all\nlife from the Earth, and bring her own\nfoul offspring to our world! For all the\ndwellers in these nightmare dimensions\nare her descendants! Once all Runes of\nmagic power are united, the energy\nbehind them will blast open the Gateway\nto Shub-Niggurath, and you can travel\nthere to foil the Hell-Mother's plots\nin person.";
+		}
+
+		if (intermissiontext)
 		{
 			WriteByte (MSG_ALL, SVC_CDTRACK);
 			WriteByte (MSG_ALL, 2);
 			WriteByte (MSG_ALL, 3);
 
 			WriteByte (MSG_ALL, SVC_FINALE);
-			WriteString (MSG_ALL, "Despite the awful might of the Elder\nWorld, you have achieved the Rune of\nElder Magic, capstone of all types of\narcane wisdom. Beyond good and evil,\nbeyond life and death, the Rune\npulsates, heavy with import. Patient and\npotent, the Elder Being Shub-Niggurath\nweaves her dire plans to clear off all\nlife from the Earth, and bring her own\nfoul offspring to our world! For all the\ndwellers in these nightmare dimensions\nare her descendants! Once all Runes of\nmagic power are united, the energy\nbehind them will blast open the Gateway\nto Shub-Niggurath, and you can travel\nthere to foil the Hell-Mother's plots\nin person.");
+			WriteString (MSG_ALL, intermissiontext);
+			intermissiontext = string_null;
 			return;
 		}
 
-		GotoNextMap();
+		if ( nextmap == "start" && !coop )
+		{
+			localcmd("menu_credits\n");
+			localcmd("disconnect\n");
+		} 
+		else 
+		{
+			GotoNextMap();
+		}
+
 	}
 	
 	if (intermission_running == 3)
@@ -224,19 +231,18 @@ void() ExitIntermission =
 		{	// shareware episode has been completed, go to sell screen
 			WriteByte (MSG_ALL, SVC_SELLSCREEN);
 			return;
-		}
-		
-		if ( (serverflags&15) == 15)
-		{
-			WriteByte (MSG_ALL, SVC_FINALE);
-			WriteString (MSG_ALL, "Now, you have all four Runes. You sense\ntremendous invisible forces moving to\nunseal ancient barriers. Shub-Niggurath\nhad hoped to use the Runes Herself to\nclear off the Earth, but now instead,\nyou will use them to enter her home and\nconfront her as an avatar of avenging\nEarth-life. If you defeat her, you will\nbe remembered forever as the savior of\nthe planet. If she conquers, it will be\nas if you had never been born.");
-			return;
-		}
-		
+		}		
 	}
-	
 
-	GotoNextMap();
+	if ( nextmap == "start" && !coop )
+	{
+		localcmd("menu_credits\n");
+		localcmd("disconnect\n");
+	} 
+	else 
+	{
+		GotoNextMap();
+	}
 };
 
 /*
@@ -300,12 +306,8 @@ void() execute_changelevel =
 		other.movetype = MOVETYPE_NONE;
 		other.modelindex = 0;
 		setorigin (other, pos.origin);
-		
-		if(fogsettings.classname == "trigger_fogcontroller"){
-			//dprint("Setting fog during intermission.\n");
-			//eprint(fogsettings);
-			fog_setOverrideConditional(other, fogsettings.view_ofs, fogsettings.ideal_yaw, 1);
-		}
+				
+		FogPushSettingsFrom(other, pos, 0);
 		
 		other = find (other, classname, "player");
 	}	
@@ -316,8 +318,6 @@ void() execute_changelevel =
 
 void() changelevel_touch =
 {
-	local entity	pos;
-
 	if (other.classname != "player")
 		return;
 
@@ -329,8 +329,8 @@ void() changelevel_touch =
 
 	if (coop || deathmatch)
 	{
-		bprint (other.netname);
-		bprint (" exited the level\n");
+		bprint(other.netname);
+		bprint(" exited the level\n");
 	}
 	
 	nextmap = self.map;
@@ -371,6 +371,24 @@ void() trigger_changelevel =
 
 =============================================================================
 */
+void LoadGame()
+{
+	dprint("\n\nLoadGame: self.classname = ");
+	dprint(self.classname);
+	dprint("\n\n");
+
+	//For each player...
+	entity cl = find(world, classname, "player");
+	while(cl)
+	{
+		if(cl.fog_density)
+		{
+			//Restore fog
+			SetFog(cl, cl.fog_density, cl.fog_color, 0.0);
+		}
+		cl = find(cl, classname, "player");
+	}
+}
 
 void() set_suicide_frame;
 
@@ -416,8 +434,8 @@ Player entered the suicide command
 */
 void() ClientKill =
 {
-	bprint (self.netname);
-	bprint (" suicides\n");
+	bprint(self.netname);
+	bprint(" suicides\n");
 	set_suicide_frame ();
 	self.modelindex = modelindex_player;
 	self.frags = self.frags - 2;	// extra penalty
@@ -442,20 +460,23 @@ entity() SelectSpawnPoint =
 	local	entity thing;
 	local	float  pcount;
 	
-// testinfo_player_start is only found in regioned levels
-	spot = find (world, classname, "testplayerstart");
-	if (spot)
-		return spot;
-		
-// choose a info_player_deathmatch point
+	// choose a info_player_deathmatch point
 	if (coop)
 	{
+		// choose a info_player_coop point that is active
+		entity startedAt = lastspawn;
 		lastspawn = find(lastspawn, classname, "info_player_coop");
-		if (lastspawn == world)
-			lastspawn = find (lastspawn, classname, "info_player_start");
+		while(lastspawn.state != COOP_SPAWN_ACTIVE)
+		{
+			if(lastspawn == startedAt) break;
+			lastspawn = find(lastspawn, classname, "info_player_coop");
+		}
+
 		if (lastspawn != world)
+		{
 			return lastspawn;
-	}
+		}
+	} 
 	else if (deathmatch)
 	{
 		spot = lastspawn;
@@ -509,7 +530,30 @@ called each time a player is spawned
 */
 void() DecodeLevelParms;
 void() PlayerDie;
-void() info_stuffcmd_do;
+
+void PrintVersionMessage()
+{
+	if(cvar("developer"))
+	{
+		centerprint(self, "This is the honey progs.dat\nThis message was updated 2022-07-16\n");
+	}
+}
+
+void RunPostPutClientInServer() 
+{
+	entity oself = self;
+	self = self.owner;
+	entity spot = oself.enemy;
+
+	// Fog settings sometimes (?) need to be set a frame after the client has spawned.
+	// Not sure why, or why it sometimes works on the same frame.
+	if(!FogPushSettingsFrom(self, spot, 0))
+	{
+		FogPushSettingsFrom(self, world, 0);
+	}
+	SUB_DoLater(PrintVersionMessage, 1);
+	remove(oself);
+}
 
 void() PutClientInServer =
 {
@@ -518,11 +562,17 @@ void() PutClientInServer =
 	spot = SelectSpawnPoint ();
 
 	self.classname = "player";
+	if (skill == 3 && !deathmatch)
+		self.health = 50;
+	else
 	self.health = 100;
 	self.takedamage = DAMAGE_AIM;
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_WALK;
 	self.show_hostile = 0;
+	if (skill == 3 && !deathmatch)
+		self.max_health = 50;
+	else
 	self.max_health = 100;
 	self.flags = FL_CLIENT;
 	self.air_finished = time + 12;
@@ -535,11 +585,6 @@ void() PutClientInServer =
 	self.invincible_time = 0;
 	
 	self.enemy = world;
-	//A hack: This doesn't work at level load, so if time is < 2 try again a bit later.
-	if(time < 2){
-		SUB_DoLater(info_stuffcmd_do, 0.1);
-	}
-	
 
 	DecodeLevelParms ();
 	
@@ -553,11 +598,20 @@ void() PutClientInServer =
 // paustime is set by teleporters to keep the player from moving a while
 	self.pausetime = 0;
 	
-//	spot = SelectSpawnPoint ();
-
 	self.origin = spot.origin + '0 0 1';
 	self.angles = spot.angles;
 	self.fixangle = TRUE;		// turn this way immediately
+
+#ifdef COOP_RESPAWN_KEEP_WEAPONS
+	if(coop)
+	{ 
+		// In coop we want to give back the players the weapons they progressed with
+		self.items |= (spot.items & (IT_ALL_WEAPONS | IT_KEY1 | IT_KEY2));
+		if(self.items & (IT_NAILGUN | IT_SUPER_NAILGUN)) self.ammo_nails = 30;
+		if(self.items & (IT_GRENADE_LAUNCHER | IT_ROCKET_LAUNCHER)) self.ammo_rockets = 4;
+		if(self.items & IT_LIGHTNING) self.ammo_cells = 12;
+	}
+#endif	
 
 // oh, this is a hack!
 	setmodel (self, "progs/eyes.mdl");
@@ -579,6 +633,12 @@ void() PutClientInServer =
 	}
 
 	spawn_tdeath (self.origin, self);
+
+	entity postSpawn = spawn();
+	postSpawn.owner = self;
+	postSpawn.enemy = spot;
+	postSpawn.think = RunPostPutClientInServer;
+	postSpawn.nextthink = time + 0.05;
 };
 
 
@@ -617,16 +677,85 @@ void() testplayerstart =
 /*QUAKED info_player_deathmatch (1 0 1) (-16 -16 -24) (16 16 24)
 potential spawning position for deathmatch games
 */
-void() info_player_deathmatch =
+void info_player_deathmatch()
 {
 };
+
+//////////////////////////////////////////////////////////////////////////
+// Coop spawn points / checkpoints
+//////////////////////////////////////////////////////////////////////////
+
+void trigger_activate_coop_spawns_use()
+{
+	float it = 0;
+
+#ifdef COOP_RESPAWN_KEEP_WEAPONS
+	entity p = find (world, classname, "player");
+	while (p != world)
+	{
+		it |= p.items;
+		p = find (p, classname, "player");
+	}	
+	it &= IT_ALL_WEAPONS | IT_KEY1 | IT_KEY2;
+#endif
+	
+	dprint("Activating coop spawn \"");
+	dprint(self.target);
+	dprint("\": Collected ");
+	dprint(ftos(it));
+	dprint(" from players.\n");
+
+	entity s = find(world, classname, "info_player_coop");
+	while(s)
+	{
+		if(s.targetname == self.target)
+		{
+			s.state = COOP_SPAWN_ACTIVE;
+			s.items = it;
+		}
+		else
+		{
+			s.state = 0;
+			s.items = 0;
+		}
+		s = find(s, classname, "info_player_coop");
+	}
+}
+
+/*QUAKED trigger_activate_coop_spawns (1 0 1) (-8 -8 -8) (8 8 8)
+Activates a set of coop spawnpoints.
+*/
+void trigger_activate_coop_spawns()
+{
+	if(!coop)
+	{
+		remove(self);
+		return;
+	}
+	self.use = trigger_activate_coop_spawns_use;
+}
 
 /*QUAKED info_player_coop (1 0 1) (-16 -16 -24) (16 16 24)
 potential spawning position for coop games
 */
-void() info_player_coop =
+void info_player_coop()
 {
+	if(!coop)
+	{
+		remove(self);
+		return;
+	}
+	self.netname = "info_player_coop"; // for bot nav support.
+	if(!self.targetname)
+	{
+		self.state = COOP_SPAWN_ACTIVE;
+	} 
+	if(self.spawnflags & COOP_SPAWN_ACTIVE)
+	{
+		self.state = COOP_SPAWN_ACTIVE;
+	}
 };
+
 
 /*
 ===============================================================================
@@ -733,7 +862,6 @@ void() CheckRules =
 
 void() PlayerDeathThink =
 {
-	local entity	old_self;
 	local float		forward;
 
 	if ((self.flags & FL_ONGROUND))
@@ -768,8 +896,6 @@ void() PlayerDeathThink =
 
 void() PlayerJump =
 {
-	local vector start, end;
-	
 	if (self.flags & FL_WATERJUMP)
 		return;
 	
@@ -822,7 +948,6 @@ WaterMove
 
 void() WaterMove =
 {
-//dprint (ftos(self.waterlevel));
 	if (self.movetype == MOVETYPE_NOCLIP)
 		return;
 	if (self.health < 0)
@@ -898,7 +1023,9 @@ void() WaterMove =
 	}
 	
 	if (! (self.flags & FL_WATERJUMP) )
-		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
+	{
+		self.velocity-= 0.8 * self.waterlevel * frametime * self.velocity;
+	}
 };
 
 void() CheckWaterJump =
@@ -931,7 +1058,6 @@ void() CheckWaterJump =
 };
 
 
-void() fog_updateAll;
 /*
 ================
 PlayerPreThink
@@ -941,11 +1067,6 @@ Called every frame before physics are run
 */
 void() PlayerPreThink =
 {
-	local	float	mspeed, aspeed;
-	local	float	r;
-
-	fog_updateAll();
-	
 	if (intermission_running)
 	{
 		IntermissionThink ();	// otherwise a button could be missed between
@@ -959,7 +1080,6 @@ void() PlayerPreThink =
 
 	CheckRules ();
 	WaterMove ();
-
 	
 	if (self.waterlevel == 2)
 		CheckWaterJump ();
@@ -1018,7 +1138,7 @@ void() CheckPowerups =
 		{
 			if (self.invisible_time == 1)
 			{
-				sprint (self, "Ring of Shadows magic is fading\n");
+				sprint(self, "Ring of Shadows magic is fading\n");
 				stuffcmd (self, "bf\n");
 				sound (self, CHAN_AUTO, "items/inv2.wav", 1, ATTN_NORM);
 				self.invisible_time = time + 1;
@@ -1073,9 +1193,9 @@ void() CheckPowerups =
 			self.invincible_finished = 0;
 		}
 		if (self.invincible_finished > time)
-			self.effects = self.effects | EF_DIMLIGHT;
+			self.effects = self.effects | EF_PENTLIGHT;
 		else
-			self.effects = self.effects - (self.effects & EF_DIMLIGHT);
+			self.effects = self.effects - (self.effects & EF_PENTLIGHT);
 	}
 
 // super damage
@@ -1108,9 +1228,9 @@ void() CheckPowerups =
 			self.super_time = 0;
 		}
 		if (self.super_damage_finished > time)
-			self.effects = self.effects | EF_DIMLIGHT;
+			self.effects = self.effects | EF_QUADLIGHT;
 		else
-			self.effects = self.effects - (self.effects & EF_DIMLIGHT);
+			self.effects = self.effects - (self.effects & EF_QUADLIGHT);
 	}	
 
 // suit	
@@ -1146,7 +1266,6 @@ void() CheckPowerups =
 
 };
 
-
 /*
 ================
 PlayerPostThink
@@ -1156,9 +1275,6 @@ Called every frame after physics are run
 */
 void() PlayerPostThink =
 {
-	local	float	mspeed, aspeed;
-	local	float	r;
-
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
 	if (self.deadflag)
@@ -1167,8 +1283,6 @@ void() PlayerPostThink =
 // do weapon stuff
 
 	W_WeaponFrame ();
-
-// TODO: do deathfog stuff
 
 // check to see if player landed and play landing sound	
 	if ((self.jump_flag < -300) && (self.flags & FL_ONGROUND) && (self.health > 0))
@@ -1193,7 +1307,6 @@ void() PlayerPostThink =
 	CheckPowerups ();
 };
 
-
 /*
 ===========
 ClientConnect
@@ -1203,10 +1316,12 @@ called when a player connects to a server
 */
 void() ClientConnect =
 {
-	bprint (self.netname);
-	bprint (" entered the game\n");
+	bprint(self.netname);
+	bprint(" entered the game\n");
 	
-// a client connecting during an intermission can cause problems
+	num_players++;
+
+	// a client connecting during an intermission can cause problems
 	if (intermission_running)
 		ExitIntermission ();
 };
@@ -1221,16 +1336,20 @@ called when a player disconnects from a server
 */
 void() ClientDisconnect =
 {
-	if (gameover)
-		return;
 	// if the level end trigger has been activated, just return
 	// since they aren't *really* leaving
+	if (gameover)
+	{
+		return;
+	}
+
+	num_players--;
 
 	// let everyone else know
-	bprint (self.netname);
-	bprint (" left the game with ");
-	bprint (ftos(self.frags));
-	bprint (" frags\n");
+	bprint(self.netname);
+	bprint(" left the game with ");
+	bprint(ftos(self.frags));
+	bprint(" frags\n");
 	sound (self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_NONE);
 	set_suicide_frame ();
 };
@@ -1245,27 +1364,26 @@ called when a player dies
 void(entity targ, entity attacker) ClientObituary =
 {
 	local	float rnum;
-	local	string deathstring, deathstring2;
 	rnum = random();
 
 	if (targ.classname == "player")
 	{
 		if (attacker.classname == "teledeath")
 		{
-			bprint (targ.netname);
-			bprint (" was telefragged by ");
-			bprint (attacker.owner.netname);
-			bprint ("\n");
+			bprint(targ.netname);
+			bprint(" was telefragged by ");
+			bprint(attacker.owner.netname);
+			bprint("\n");
 
 			attacker.owner.frags = attacker.owner.frags + 1;
 			return;
 		}
 
-		if (attacker.classname == "teledeath2")
+		else if (attacker.classname == "teledeath2")
 		{
-			bprint ("Satan's power deflects ");
-			bprint (targ.netname);
-			bprint ("'s telefrag\n");
+			bprint("Satan's power deflects ");
+			bprint(targ.netname);
+			bprint("'s telefrag\n");
 
 			targ.frags = targ.frags - 1;
 			return;
@@ -1273,42 +1391,9 @@ void(entity targ, entity attacker) ClientObituary =
 
 		if (attacker.classname == "player")
 		{
-			if (targ == attacker)
-			{
-				// killed self
-				attacker.frags = attacker.frags - 1;
-				bprint (targ.netname);
-				
-				if (targ.weapon == 64 && targ.waterlevel > 1)
-				{
-					bprint (" discharges into the water.\n");
-					return;
-				}
-				if (targ.weapon == IT_GRENADE_LAUNCHER)
-					bprint (" tries to put the pin back in\n");
-				else
-					bprint (" becomes bored with life\n");
-				return;
-			}
-			else if ( (teamplay == 2) && (targ.team > 0)&&(targ.team == attacker.team) )
-			{
-				if (rnum < 0.25)
-					deathstring = " mows down a teammate\n";
-				else if (rnum < 0.50)
-					deathstring = " checks his glasses\n";
-				else if (rnum < 0.75)
-					deathstring = " gets a frag for the other team\n";
-				else
-					deathstring = " loses another friend\n";
-				bprint (attacker.netname);
-				bprint (deathstring);
-				attacker.frags = attacker.frags - 1;
-				return;
-			}
-			else
 			{
 				attacker.frags = attacker.frags + 1;
-
+				string deathstring, deathstring2;
 				rnum = attacker.weapon;
 				if (rnum == IT_AXE)
 				{
@@ -1367,132 +1452,114 @@ void(entity targ, entity attacker) ClientObituary =
 				bprint (deathstring);
 				bprint (attacker.netname);
 				bprint (deathstring2);
-			}
-			return;
-		}
-		else
-		{
-			targ.frags = targ.frags - 1;
-			bprint (targ.netname);
-
-			// killed by a montser?
-			if (attacker.flags & FL_MONSTER)
-			{
-				if (attacker.classname == "monster_army")
-					bprint (" was shot by a Grunt\n");
-				if (attacker.classname == "monster_demon1")
-					bprint (" was eviscerated by a Fiend\n");
-				if (attacker.classname == "monster_dog")
-					bprint (" was mauled by a Rottweiler\n");
-				if (attacker.classname == "monster_dragon")
-					bprint (" was fried by a Dragon\n");
-				if (attacker.classname == "monster_enforcer")
-					bprint (" was blasted by an Enforcer\n");
-				if (attacker.classname == "monster_fish")
-					bprint (" was fed to the Rotfish\n");
-				if (attacker.classname == "monster_hell_knight")
-					bprint (" was slain by a Death Knight\n");
-				if (attacker.classname == "monster_knight")
-					bprint (" was slashed by a Knight\n");
-				if (attacker.classname == "monster_ogre")
-					bprint (" was destroyed by an Ogre\n");
-				if (attacker.classname == "monster_oldone")
-					bprint (" became one with Shub-Niggurath\n");
-				if (attacker.classname == "monster_shalrath")
-					bprint (" was exploded by a Vore\n");
-				if (attacker.classname == "monster_shambler")
-					bprint (" was smashed by a Shambler\n");
-				if (attacker.classname == "monster_tarbaby")
-					bprint (" was slimed by a Spawn\n");
-				if (attacker.classname == "monster_vomit")
-					bprint (" was vomited on by a Vomitus\n");
-				if (attacker.classname == "monster_wizard")
-					bprint (" was scragged by a Scrag\n");
-				if (attacker.classname == "monster_zombie")
-					bprint (" joins the Zombies\n");
-
 				return;
 			}
-
-			// tricks and traps
-			if (attacker.classname == "explo_box")
-			{
-				bprint (" blew up\n");
-				return;
-			}
-			if (attacker.solid == SOLID_BSP && attacker != world)
-			{	
-				bprint (" was squished\n");
-				return;
-			}
-			if (attacker.classname == "trap_shooter" || attacker.classname == "trap_spikeshooter")
-			{
-				bprint (" was spiked\n");
-				return;
-			}
-			if (attacker.classname == "fireball")
-			{
-				bprint (" ate a lavaball\n");
-				return;
-			}
-			if (attacker.classname == "trigger_changelevel")
-			{
-				bprint (" tried to leave\n");
-				return;
-			}
-			if (attacker.classname == "trigger_deathpit")
-			{
-				if (attacker.message){
-					bprint (attacker.message);
-				}else{
-					bprint (" fell into a deep and dark crevasse");
-				}
-				bprint ("\n");
-				return;
-			}
-
-			// in-water deaths
-			rnum = targ.watertype;
-			if (rnum == -3)
-			{
-				if (random() < 0.5)
-					bprint (" sleeps with the fishes\n");
-				else
-					bprint (" sucks it down\n");
-				return;
-			}
-			else if (rnum == -4)
-			{
-				if (random() < 0.5)
-					bprint (" gulped a load of slime\n");
-				else
-					bprint (" can't exist on slime alone\n");
-				return;
-			}
-			else if (rnum == -5)
-			{
-				if (targ.health < -15)
-				{
-					bprint (" burst into flames\n");
-					return;
-				}
-				if (random() < 0.5)
-					bprint (" turned into hot slag\n");
-				else
-					bprint (" visits the Volcano God\n");
-				return;
-			}
-
-			// fell to their death?
-			if (targ.deathtype == "falling")
-			{
-				targ.deathtype = "";
-				bprint (" fell to his death\n");
-				return;
-			}
-
-			// hell if I know; he's just dead!!!
-			bprint (" died\n");
 		}
 	}
-};
+	else
+	{
+		targ.frags = targ.frags - 1;		
+		bprint (targ.netname);
+		// killed by a montser?
+		if (attacker.flags & FL_MONSTER)
+		{
+			if (attacker.classname == "monster_army")
+				bprint (" was shot by a Grunt\n");
+			if (attacker.classname == "monster_demon1")
+				bprint (" was eviscerated by a Fiend\n");
+			if (attacker.classname == "monster_dog")
+				bprint (" was mauled by a Rottweiler\n");
+			if (attacker.classname == "monster_enforcer")
+				bprint (" was blasted by an Enforcer\n");
+			if (attacker.classname == "monster_fish")
+				bprint (" was fed to the Rotfish\n");
+			if (attacker.classname == "monster_hell_knight")
+				bprint (" was slain by a Death Knight\n");
+			if (attacker.classname == "monster_knight")
+				bprint (" was slashed by a Knight\n");
+			if (attacker.classname == "monster_ogre")
+				bprint (" was destroyed by an Ogre\n");
+			if (attacker.classname == "monster_shalrath")
+				bprint (" was exploded by a Vore\n");
+			if (attacker.classname == "monster_shambler")
+				bprint (" was smashed by a Shambler\n");
+			if (attacker.classname == "monster_tarbaby")
+				bprint (" was slimed by a Spawn\n");
+			if (attacker.classname == "monster_wizard")
+				bprint (" was scragged by a Scrag\n");
+			if (attacker.classname == "monster_zombie")
+				bprint (" joins the Zombies\n");
+
+			return;
+		}
+
+		// tricks and traps
+		if (attacker.classname == "explo_box") 
+		{
+			bprint (" blew up\n");
+			return;
+		}
+		if (attacker.solid == SOLID_BSP && attacker != world)
+		{	
+			bprint (" was squished\n");
+			return;
+		}
+		if (attacker.classname == "trap_shooter" || attacker.classname == "trap_spikeshooter")
+		{
+			bprint (" was spiked\n");
+			return;
+		}
+		if (attacker.classname == "fireball")
+		{
+			bprint (" ate a lavaball\n");
+			return;
+		}
+		if (attacker.classname == "trigger_changelevel")
+		{
+			bprint (" tried to leave\n");
+			return;
+		}
+
+		// in-water deaths
+		rnum = targ.watertype;
+		if (rnum == -3)
+		{
+			if (random() < 0.5)
+				bprint(" sleeps with the fishes\n");
+			else
+				bprint(" sucks it down\n");
+			return;
+		}
+		else if (rnum == -4)
+		{
+			if (random() < 0.5)
+				bprint(" gulped a load of slime\n");
+			else
+				bprint(" can't exist on slime alone\n");
+			return;
+		}
+		else if (rnum == -5)
+		{
+			if (targ.health < -15)
+			{
+				bprint(" burst into flames\n");
+				return;
+			}
+			if (random() < 0.5)
+				bprint(" turned into hot slag\n");
+			else
+				bprint(" visits the Volcano God\n");
+			return;
+		}
+
+		// fell to their death?
+		if (targ.deathtype == "falling")
+		{
+			bprint(" fell to their death\n");
+			return;
+		}
+
+		// hell if I know; he's just dead!!!
+		bprint(" died\n");
+	}
+}

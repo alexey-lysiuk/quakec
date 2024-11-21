@@ -1,13 +1,22 @@
-../progs.dat
+#output "../progs.dat"
+
+#copyright "Christian Grawert 2021"
+
+#define COOP_RESPAWN_ITEMS_FOR_PLAYERS
+#define COOP_RESPAWN_KEEP_WEAPONS
+
+#includelist
 
 defs.qc
 subs.qc
 newSubs.qc
+frametick.qc
 fight.qc
 ai.qc
 combat.qc
 items.qc
 weapons.qc
+fog.qc
 world.qc
 client.qc
 player.qc
@@ -17,9 +26,6 @@ buttons.qc
 triggers.qc
 plats.qc
 misc.qc
-endcam.qc
-honey_fog.qc
-honey_fog_debug.qc
 honey_misc.qc
 
 ogre.qc
@@ -35,11 +41,15 @@ boss.qc
 tarbaby.qc
 hknight.qc
 
-sknight_tbl.qc
-sknight.qc
-sknight_debug.qc
+// sknight_tbl.qc
+// sknight.qc
+// sknight_debug.qc
 
 fish.qc
 shalrath.qc
 enforcer.qc
 oldone.qc
+
+trigger_void.qc
+
+#endlist

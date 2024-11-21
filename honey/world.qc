@@ -174,16 +174,17 @@ void() worldspawn =
 	lastspawn = world;
 	InitBodyQue ();
 
-// custom map attributes
+	// custom map attributes
 	if (self.model == "maps/e1m8.bsp")
 		cvar_set ("sv_gravity", "100");
 	else
 		cvar_set ("sv_gravity", "800");
+
+	if(self.model == "maps/credits.bsp")
+	{
+		serverflags = 0;
+	}
 	
-	fog_global_density = world.ideal_yaw;
-	fog_global_color  = world.view_ofs;
-
-
 // the area based ambient sounds MUST be the first precache_sounds
 
 // player precaches	
@@ -347,12 +348,27 @@ void() worldspawn =
 	lightstyle(63, "a");
 };
 
+void LoadGame();
+nosave float load_flag;
+float LastTime;
+
 void() StartFrame =
 {
 	teamplay = cvar("teamplay");
 	skill = cvar("skill");
 	framecount = framecount + 1;
+	float DeltaTime = time - LastTime;
+	LastTime = time;
+
+	if(!load_flag && framecount > 2)
+	{
+	   if(framecount != 3)
+		  LoadGame();
+	   load_flag = TRUE;
+	}
+	RunFrameTickEntities(DeltaTime);
 };
+
 
 /*
 ==============================================================================
@@ -371,8 +387,6 @@ void() bodyque =
 
 void() InitBodyQue =
 {
-	local entity	e;
-	
 	bodyque_head = spawn();
 	bodyque_head.classname = "bodyque";
 	bodyque_head.owner = spawn();

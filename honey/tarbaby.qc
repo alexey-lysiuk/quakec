@@ -1,3 +1,5 @@
+
+
 /*
 ==============================================================================
 
@@ -5,6 +7,7 @@ BLOB
 
 ==============================================================================
 */
+
 
 $cd id1/models/tarbaby
 $origin 0 0 24
@@ -134,12 +137,13 @@ void()	tbaby_fly1		=[	$fly1,	tbaby_fly2	] {};
 void()	tbaby_fly2		=[	$fly2,	tbaby_fly3	] {};
 void()	tbaby_fly3		=[	$fly3,	tbaby_fly4	] {};
 void()	tbaby_fly4		=[	$fly4,	tbaby_fly1	] {
-self.cnt = self.cnt + 1;
-if (self.cnt == 4)
-{
-//dprint ("spawn hop\n");
-tbaby_jump5 ();
-}
+	float l = 4;
+	if(self.spawnflags & MISSILE_RANDOM) l = 10;
+	self.cnt = self.cnt + 1;
+	if (self.cnt == l)
+	{
+		tbaby_jump5 ();
+	}
 };
 
 void()	tbaby_jump1		=[	$jump1,	tbaby_jump2		] {ai_face();};
@@ -151,21 +155,40 @@ void()	tbaby_jump5		=[	$jump5,	tbaby_jump6		]
 	local vector power;
 	if(self.spawnflags & TBABY_LIVID){
 		self.th_missile = tbaby_jump1; //Reset
-		self.spawnflags = self.spawnflags - TBABY_LIVID;
+		self.spawnflags (-) TBABY_LIVID;
 	}
 	self.movetype = MOVETYPE_BOUNCE;
 	self.touch = Tar_JumpTouch;
 	makevectors (self.angles);
 	self.origin_z = self.origin_z + 1;
 	if(self.spawnflags & TBABY_HIPHOP){// Makes it start off by jumping really high the first time
-		self.velocity = v_forward * 150 + '0 0 700';
+		if(self.spawnflags & MISSILE_RANDOM)
+		{
+			self.velocity = '0 0 700';
+			self.velocity_x += 300 * random() - 150;
+			self.velocity_y += 300 * random() - 150;
+		}
+		else
+		{
+			self.velocity = v_forward * 150 + '0 0 700';
+		}
 		self.spawnflags = self.spawnflags - TBABY_HIPHOP;
 	}else{
-		power = '0 0 0' ;
-		power_z = self.distance;
-		self.velocity = v_forward * 600 + power;
-		self.velocity_z = self.velocity_z + random()*150;
-		self.distance = 200;
+		if(self.spawnflags & MISSILE_RANDOM)
+		{
+			self.velocity = '0 0 400';
+			self.velocity_x += 800 * random() - 400;
+			self.velocity_y += 800 * random() - 400;
+			self.velocity+= v_forward * 75;
+		}
+		else
+		{
+			power = '0 0 0' ;
+			power_z = self.distance;
+			self.velocity = v_forward * 600 + power;
+			self.velocity_z = self.velocity_z + random()*150;
+			self.distance = 200;
+		}
 	}
 	if (self.flags & FL_ONGROUND)
 		self.flags = self.flags - FL_ONGROUND;
@@ -182,7 +205,8 @@ self.takedamage = DAMAGE_NO;
 };
 void()	tbaby_die2	=[	$exp,		tbaby_run1	] 
 {
-	T_RadiusDamage (self, self, 120, world);
+	self.classname = "explosion";
+	T_RadiusDamage (self, self, self.volume, world);
 
 	sound (self, CHAN_VOICE, "blob/death1.wav", 1, ATTN_NORM);
 	self.origin = self.origin - 8*normalize(self.velocity);
@@ -267,6 +291,7 @@ void() monster_tarbaby =
 		self.cnt = -1;
 	}
 	self.health = 80;
+	self.volume = 120;
 
 	self.th_stand = tbaby_stand1;
 	self.th_walk = tbaby_walk1;
@@ -293,4 +318,55 @@ void() monster_tarbaby =
 
 	walkmonster_start ();
 };
+
+void() monster_babby =
+{
+	monster_tarbaby();
+}
+
+void trigger_babkiller_think()
+{
+	entity oself = self;
+	if(self.enemy)
+	{
+		self.cnt = 0;
+		entity nextEnemy = find(self.enemy, classname, "monster_tarbaby");
+		self = self.enemy;
+		oself.enemy = nextEnemy;
+		oself.nextthink = time + 0.1;
+		self.volume = 40;
+		self.th_die();
+	}
+	else if(self.cnt < 10)
+	{
+		self.enemy = find(world, classname, "monster_tarbaby");
+		self.cnt++;
+		self.nextthink = time + 0.1;
+	}
+	else
+	{
+		total_monsters = 0;
+		killed_monsters = 0;
+		WriteByte (MSG_ALL, SVC_UPDATESTAT); 
+		WriteByte (MSG_ALL, STAT_TOTALMONSTERS);
+		WriteLong (MSG_ALL, total_monsters);
+
+		WriteByte (MSG_ALL, SVC_UPDATESTAT); 
+		WriteByte (MSG_ALL, STAT_MONSTERS);
+		WriteLong (MSG_ALL, killed_monsters);
+		SUB_Remove();
+	}
+}
+
+void trigger_babkiller_use()
+{
+	self.enemy = find(world, classname, "monster_tarbaby");
+	self.think = trigger_babkiller_think;
+	self.nextthink = time + 0.1;
+}
+
+void trigger_babkiller()
+{
+	self.use = trigger_babkiller_use;
+}
 

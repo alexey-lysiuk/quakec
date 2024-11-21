@@ -1,6 +1,7 @@
 
 
 void() SUB_Null = {};
+void(entity attacker, float damage) SUB_NullPain = {};
 
 void() SUB_Remove = {remove(self);};
 
@@ -107,8 +108,7 @@ local float		len, traveltime;
 
 void(vector tdest, float traveltime, void() func) SUB_CalcMove_time =
 {
-local vector	vdestdelta;
-local float		len;
+	vector vdestdelta;
 
 	if (!traveltime)
 		objerror("No time is defined!");

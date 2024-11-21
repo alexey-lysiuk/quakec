@@ -413,7 +413,6 @@ void() spikeshooter_use =
 
 void() shooter_think =
 {
-	local entity newmis;
 	spikeshooter_use ();
 	self.nextthink = time + self.wait;
 };
@@ -574,7 +573,6 @@ void() bubble_bob =
 {
 local float		rnd1, rnd2, rnd3;
 local float		maxz, minz;
-local vector	vtmp1, modi;
 
 	self.cnt = self.cnt + 1;
 	if (self.cnt == ceil(self.count * 0.2))
@@ -862,3 +860,88 @@ entity(vector org) ambient_secret_spawn =
 //============================================================================
 
 
+//============================================================================
+const float NO_DAMAGE = 1;
+void() trigger_explosion_activate =
+{
+	self.delay = 0;
+	SUB_UseTargets ();
+	
+	if (!(self.spawnflags & NO_DAMAGE))
+		T_RadiusDamage (self, self.owner, 120, self);
+		
+	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
+	WriteByte (MSG_BROADCAST, TE_EXPLOSION);
+	WriteCoord (MSG_BROADCAST, self.origin_x);
+	WriteCoord (MSG_BROADCAST, self.origin_y);
+	WriteCoord (MSG_BROADCAST, self.origin_z);
+	
+	BecomeExplosion();
+}
+
+void() trigger_explosion_use =
+{
+	if(self.delay > 0)
+	{
+		self.think = trigger_explosion_activate;
+		self.nextthink = time + self.delay;
+	}
+	else
+	{
+		trigger_explosion_activate();
+	}
+}
+
+void() trigger_explosion =
+{
+	
+	self.use = trigger_explosion_use;
+};
+
+// ======================================================
+// ======================================================
+float REPEATER_ON = 1;
+void() repeater_think =
+{
+	SUB_UseTargets();
+	self.nextthink = time + self.wait + (self.pausetime * random());
+};
+
+void() repeater_use =
+{
+	if (self.spawnflags & REPEATER_ON)
+	{
+		// turn off
+		self.spawnflags = self.spawnflags - REPEATER_ON;
+		self.nextthink = 0;
+		self.think = SUB_Null;
+	}
+	else
+	{
+		// turn on
+		self.spawnflags = self.spawnflags + REPEATER_ON;
+		self.nextthink = time + self.wait + (self.pausetime * random());
+		self.think = repeater_think;
+	}
+};
+
+void() trigger_repeater =
+{
+	if (!self.wait)
+	{
+		self.wait = 1;
+	}
+	self.use = repeater_use;
+	if (self.spawnflags & REPEATER_ON)
+	{
+		self.nextthink = time + self.wait + (self.pausetime * random());
+		self.think = repeater_think;
+	}
+	else
+	{	
+		self.nextthink = 0;
+		self.think = SUB_Null;
+	}
+};
+
+//============================================================================

@@ -1,14 +1,3 @@
-/* ALL MONSTERS SHOULD BE 1 0 0 IN COLOR */
-
-// name =[framenum,	nexttime, nextthink] {code}
-// expands to:
-// name ()
-// {
-//		self.frame=framenum;
-//		self.nextthink = time + nexttime;
-//		self.think = nextthink
-//		<code>
-// };
 
 
 /*
@@ -90,7 +79,7 @@ void() monster_check_remove_corpse =
 {
 	local entity player;
 	
-	if(!self.spawnflags & REMOVE_CORPSE) return;
+	if(!(self.spawnflags & REMOVE_CORPSE)) return;
 	
 	player = find (world, classname, "player");
 	while (player)
@@ -118,9 +107,7 @@ enemy as activator.
 */
 void() monster_death_use =
 {
-	local entity 	ent, otemp, stemp;
-
-// fall to ground
+	// fall to ground
 	if (self.flags & FL_FLY)
 		self.flags = self.flags - FL_FLY;
 	if (self.flags & FL_SWIM)
@@ -139,35 +126,12 @@ void() monster_death_use =
 void() walkmonster_start_go =
 {
 local string	stemp;
-local entity	etemp;
 
 	self.origin_z = self.origin_z + 1;	// raise off floor a bit
 	if(self.classname == "monster_tarbaby" && self.spawnflags & TBABY_HIPHOP){
 		stemp = stemp;
-		//Don't do anything..
 	}else{
 		droptofloor();
-		
-		/* //Fuck this
-		if (!walkmove(0,0))
-		{
-			dprint ("walkmonster in wall at: ");
-			dprint (vtos(self.origin));
-
-			dprint (self.classname);
-			if(self.target){
-				dprint (" (target = ");
-				dprint (self.target);
-				dprint (" )");
-			}
-			if(self.targetname){
-				dprint (" (targetname = ");
-				dprint (self.targetname);
-				dprint (" )");
-			}
-			dprint ("\n");
-		}
-		*/
 	}
 
 	self.takedamage = DAMAGE_AIM;

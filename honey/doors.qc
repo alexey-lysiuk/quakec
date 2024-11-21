@@ -5,6 +5,7 @@ float DOOR_GOLD_KEY = 8;
 float DOOR_SILVER_KEY = 16;
 float DOOR_TOGGLE = 32;
 float DOOR_TRIGGER_ON_END = 64;
+float DOOR_NONSOLID = 8192;
 
 /*
 
@@ -235,25 +236,22 @@ void() door_touch =
 	if (!self.items)
 		return;
 
-// FIXME: blink key on player's status bar
 	if ( (self.items & other.items) != self.items )
 	{
+		sound (self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 		if (self.owner.items == IT_KEY1)
 		{
 			if (world.worldtype == 2)
 			{
 				centerprint (other, "You need the silver keycard");
-				sound (self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 			}
 			else if (world.worldtype == 1)
 			{
 				centerprint (other, "You need the silver runekey");
-				sound (self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 			}
 			else if (world.worldtype == 0)
 			{
 				centerprint (other, "You need the silver key");
-				sound (self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 			}
 		}
 		else
@@ -261,17 +259,14 @@ void() door_touch =
 			if (world.worldtype == 2)
 			{
 				centerprint (other, "You need the gold keycard");
-				sound (self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 			}
 			else if (world.worldtype == 1)
 			{
 				centerprint (other, "You need the gold runekey");
-				sound (self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);			
 			}
 			else if (world.worldtype == 0)
 			{
 				centerprint (other, "You need the gold key");
-				sound (self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 			}
 		}
 		return;
@@ -518,8 +513,16 @@ void() func_door =
 		SetMovedir ();
 
 	self.max_health = self.health;
-	self.solid = SOLID_BSP;
-	self.movetype = MOVETYPE_PUSH;
+	if(self.spawnflags & DOOR_NONSOLID)
+	{
+		self.solid = SOLID_NOT;
+		self.movetype = MOVETYPE_PUSH;
+	}
+	else
+	{
+		self.solid = SOLID_BSP;
+		self.movetype = MOVETYPE_PUSH;
+	}
 	setorigin (self, self.origin);	
 	setmodel (self, self.model);
 	//self.classname = "door"; //Why was this done?
@@ -605,47 +608,47 @@ void () fd_secret_use =
 	local float temp;
 	
 	self.health = 10000;
-
+	
 	// exit if still moving around...
 	if (self.origin != self.oldorigin)
-		return;
+	return;
 	
 	self.message = string_null;		// no more message
 	
 	SUB_UseTargets();
-
+	
 	if (!(self.spawnflags & SECRET_NO_SHOOT))
 	{
-		self.th_pain = SUB_Null;
+		self.th_pain = SUB_NullPain;
 		self.takedamage = DAMAGE_NO;
 	}
 	self.velocity = '0 0 0';
-
+	
 	// Make a sound, wait a little...
 	
 	sound(self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	self.nextthink = self.ltime + 0.1;
-
+	
 	temp = 1 - (self.spawnflags & SECRET_1ST_LEFT);	// 1 or -1
 	makevectors(self.mangle);
 	
 	if (!self.t_width)
 	{
 		if (self.spawnflags & SECRET_1ST_DOWN)
-			self. t_width = fabs(v_up * self.size);
+		self. t_width = fabs(v_up * self.size);
 		else
-			self. t_width = fabs(v_right * self.size);
+		self. t_width = fabs(v_right * self.size);
 	}
-		
+	
 	if (!self.t_length)
-		self. t_length = fabs(v_forward * self.size);
+	self. t_length = fabs(v_forward * self.size);
 	
 	if(!(self.dest1_x|self.dest1_y|self.dest1_z))
 	{
 		if (self.spawnflags & SECRET_1ST_DOWN)
-			self.dest1 = self.origin - v_up * self.t_width;
+		self.dest1 = self.origin - v_up * self.t_width;
 		else
-			self.dest1 = self.origin + v_right * (self.t_width * temp);
+		self.dest1 = self.origin + v_right * (self.t_width * temp);
 	}
 	
 	if(!(self.dest2_x|self.dest2_y|self.dest2_z)){
@@ -654,6 +657,11 @@ void () fd_secret_use =
 	SUB_CalcMove(self.dest1, self.speed, fd_secret_move1);
 	sound(self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
 };
+
+void (entity attacker, float damage) fd_secret_pain =
+{
+	fd_secret_use();
+}
 
 // Wait after first movement...
 void () fd_secret_move1 = 
@@ -708,7 +716,7 @@ void () fd_secret_done =
 	{
 		self.health = 10000;
 		self.takedamage = DAMAGE_YES;
-		self.th_pain = fd_secret_use;	
+		self.th_pain = fd_secret_pain;	
 	}
 	sound(self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 };
@@ -819,7 +827,7 @@ void () func_door_secret =
 	{
 		self.health = 10000;
 		self.takedamage = DAMAGE_YES;
-		self.th_pain = fd_secret_use;
+		self.th_pain = fd_secret_pain;
 		self.th_die = fd_secret_use;
 	}
 	self.oldorigin = self.origin;

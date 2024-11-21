@@ -88,10 +88,8 @@ void() button_touch =
 
 void() button_killed =
 {
-	
 	self.enemy = damage_attacker;
 	self.health = self.max_health;
-
 	self.takedamage = DAMAGE_NO;	// wil be reset upon return
 	button_fire ();
 };

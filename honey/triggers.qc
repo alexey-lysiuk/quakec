@@ -303,8 +303,6 @@ void() trigger_secret =
 
 void() counter_use =
 {
-	local string junk;
-
 	self.count = self.count - 1;
 	if (self.count < 0)
 		return;
@@ -315,21 +313,31 @@ void() counter_use =
 		&& (self.spawnflags & SPAWNFLAG_NOMESSAGE) == 0)
 		{
 			if (self.count >= 4)
-				centerprint (activator, "There are more to go...");
+			{
+				centerprint_all ("There are more to go...");
+			} 
 			else if (self.count == 3)
-				centerprint (activator, "Only 3 more to go...");
+			{
+				centerprint_all ("Only 3 more to go...");
+			}
 			else if (self.count == 2)
-				centerprint (activator, "Only 2 more to go...");
+			{
+				centerprint_all ("Only 2 more to go...");
+			}
 			else
-				centerprint (activator, "Only 1 more to go...");
+			{
+				centerprint_all ("Only 1 more to go...");
+			}
 		}
 		return;
 	}
 	
-	if (activator.classname == "player"
-	&& (self.spawnflags & SPAWNFLAG_NOMESSAGE) == 0)
-		centerprint(activator, "Sequence completed!");
+	if (activator.classname == "player"	&& (self.spawnflags & SPAWNFLAG_NOMESSAGE) == 0)
+	{
+		centerprint_all("Sequence completed!");
+	}
 	self.enemy = activator;
+		
 	multi_trigger ();
 };
 
@@ -499,6 +507,11 @@ local vector	org;
 		if (other.flags & FL_ONGROUND)
 			other.flags = other.flags - FL_ONGROUND;
 		other.velocity = v_forward * 300;
+
+		if(!coop && !deathmatch)
+		{
+			FogPushSettingsFrom(other, t, 0);
+		}
 	}
 	other.flags = other.flags - other.flags & FL_ONGROUND;
 };
@@ -651,9 +664,11 @@ void() hurt_touch =
 		T_Damage (other, self, self, self.dmg);
 		self.think = hurt_on;
 		self.nextthink = time + 1;
+		if(self.target)
+		{
+			SUB_UseTargets();
+		}
 	}
-
-	return;
 };
 
 /*QUAKED trigger_hurt (.5 .5 .5) ?
@@ -755,8 +770,11 @@ void() trigger_monsterjump =
 	if (self.angles == '0 0 0')
 		self.angles = '0 360 0';
 		
-	InitTrigger ();
 	self.touch = trigger_monsterjump_touch;
+	if(self.targetname)
+		self.use = InitTrigger;
+	else
+		InitTrigger ();
 };
 
 void() trigger_babyhop_touch =

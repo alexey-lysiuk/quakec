@@ -40,7 +40,7 @@ void() W_FireAxe =
 {
 	local	vector	source;
 	local	vector	org;
-	local 	entity	zombie, oself;
+	local 	entity	zombie;
 	local 	float	zombie_dist;
 	local 	float 	noStoneHit;
 
@@ -121,7 +121,7 @@ SpawnMeatSpray
 */
 void(vector org, vector vel) SpawnMeatSpray =
 {
-	local	entity missile, mpuff;
+	local	entity missile;
 
 	missile = spawn ();
 	missile.owner = self;
@@ -417,7 +417,7 @@ vector missile_check_aimhelp(entity client, vector morg, vector default);
 
 void() W_FireRocket =
 {
-	local	entity missile, mpuff;
+	local	entity missile;
 	local	vector morg;
 	
 	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
@@ -608,7 +608,7 @@ W_FireGrenade
 */
 void() W_FireGrenade =
 {
-	local	entity missile, mpuff;
+	local	entity missile;
 	
 	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
 	
@@ -691,7 +691,6 @@ entity(vector org, vector dir) launch_spike =
 entity() W_FireSuperSpikes =
 {
 	local vector	dir;
-	local entity	old;
 	local entity newmis;
 	
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
@@ -710,7 +709,6 @@ entity() W_FireSuperSpikes =
 void(float ox) W_FireSpikes =
 {
 	local vector	dir;
-	local entity	old;
 	
 	makevectors (self.v_angle);
 	
@@ -786,7 +784,6 @@ void() spike_touch =
 
 void() superspike_touch =
 {
-	local float rand;
 	local float bleed;
 	
 	if (other == self.owner)
@@ -918,7 +915,9 @@ float() W_BestWeapon =
 		return IT_NAILGUN;
 	if(self.ammo_shells >= 1 && (it & IT_SHOTGUN) )
 		return IT_SHOTGUN;
-	return IT_AXE;
+	if(it & IT_AXE )		
+		return IT_AXE;
+	return 0;
 };
 
 float() W_CheckNoAmmo =
@@ -1081,13 +1080,13 @@ void() W_ChangeWeapon =
 	
 	if (!(self.items & fl))
 	{	// don't have the weapon or the ammo
-		sprint (self, "no weapon.\n");
+		sprint (self, "No weapon\n");
 		return;
 	}
 	
 	if (am)
 	{	// don't have the ammo
-		sprint (self, "not enough ammo.\n");
+		sprint (self, "Not enough ammo\n");
 		return;
 	}
 
@@ -1103,7 +1102,7 @@ void() W_ChangeWeapon =
 CheatCommand
 ============
 */
-void() CheatCommand =
+void CheatCommand(float keys = TRUE)
 {
 	if (deathmatch || coop)
 		return;
@@ -1111,15 +1110,16 @@ void() CheatCommand =
 	self.ammo_rockets = 100;
 	self.ammo_nails = 200;
 	self.ammo_shells = 100;
-	self.items = self.items | 
+	self.items (+) 
 		IT_AXE |
 		IT_SHOTGUN |
 		IT_SUPER_SHOTGUN |
 		IT_NAILGUN |
 		IT_SUPER_NAILGUN |
 		IT_GRENADE_LAUNCHER |
-		IT_ROCKET_LAUNCHER |
-		IT_KEY1 | IT_KEY2;
+		IT_ROCKET_LAUNCHER;
+	if(keys)
+		self.items (+) IT_KEY1 | IT_KEY2;
 
 	self.ammo_cells = 200;
 	self.items = self.items | IT_LIGHTNING;
@@ -1138,13 +1138,14 @@ Go to the next weapon with ammo
 */
 void() CycleWeaponCommand =
 {
-	local	float	it, am;
+	float it, am, ct;
 	
 	it = self.items;
 	self.impulse = 0;
 	
 	while (1)
 	{
+		ct++;
 		am = 0;
 
 		if (self.weapon == IT_LIGHTNING)
@@ -1199,6 +1200,12 @@ void() CycleWeaponCommand =
 			W_SetCurrentAmmo ();
 			return;
 		}
+		else if (ct > 9)
+		{
+			self.weapon = 0;
+			W_SetCurrentAmmo ();
+			return;
+		}
 	}
 
 };
@@ -1212,13 +1219,14 @@ Go to the prev weapon with ammo
 */
 void() CycleWeaponReverseCommand =
 {
-	local	float	it, am;
+	float it, am, ct;
 	
 	it = self.items;
 	self.impulse = 0;
 
 	while (1)
 	{
+		ct++;
 		am = 0;
 
 		if (self.weapon == IT_LIGHTNING)
@@ -1270,6 +1278,12 @@ void() CycleWeaponReverseCommand =
 	
 		if ( (it & self.weapon) && am == 0)
 		{
+			W_SetCurrentAmmo ();
+			return;
+		}
+		else if (ct > 9)
+		{
+			self.weapon = 0;
 			W_SetCurrentAmmo ();
 			return;
 		}
@@ -1300,44 +1314,6 @@ void() QuadCheat =
 };
 
 
-//DELETEME!!!
-
-void(float i) D_SK_handleImpulse;
-void() execute_changelevel;
-
-void fog_setOverride (entity client, vector color, float density, float startAt, float duration);
-void fog_releaseOverride (entity client);
-void() splashy = 
-{
-	spawn_tfog(self.origin);
-	self.think = splashy;
-	self.nextthink = time + 1;
-}
-
-void(string lol) poopy = 
-{
-	entity rnde;
-	rnde = find(world, classname, lol);
-	while(rnde){
-		
-		if(rnde.health > 0){
-			eprint(rnde);
-			rnde.think = splashy;
-			rnde.nextthink = time + 0.1;
-		}
-		rnde = find(rnde, classname, lol);
-	}
-}
-
-void() fdbg_redUp;
-void() fdbg_redDown;
-void() fdbg_greenUp;
-void() fdbg_greenDown;
-void() fdbg_blueUp;
-void() fdbg_blueDown;
-void() fdbg_densityUp;
-void() fdbg_densityDown;
-
 /*
 ============
 ImpulseCommands
@@ -1346,75 +1322,22 @@ ImpulseCommands
 */
 void() ImpulseCommands =
 {
-	vector rndv;
-	float  rndf;
-	
 	if (self.impulse >= 1 && self.impulse <= 8)
 		W_ChangeWeapon ();
 
 	if (self.impulse == 9)
 		CheatCommand ();
+	if (self.impulse == 9)
+		CheatCommand (FALSE);
 	if (self.impulse == 10)
 		CycleWeaponCommand ();
 	if (self.impulse == 11)
 		ServerflagsCommand ();
 	if (self.impulse == 12)
 		CycleWeaponReverseCommand ();
-	if (self.impulse == 78){
-		nextmap = mapname;
-		execute_changelevel();
-	}
-
-	if (self.impulse == 105){ //Testing the fog override
-		rndv = '1 1 1';
-		rndv_x = random();
-		rndv_y = random();
-		rndv_z = random();
-		rndf = random() * 0.1;
-		
-		fog_setOverride (self, rndv, rndf, 0, 4);
-		dprint_str_v_str("Fog color: ",rndv,"\n");
-		dprint_str_f_str("Fog density: ",rndf,"\n");
-	}
-	if (self.impulse == 106){
-		fog_releaseOverride(self);
-		
-	}
-
-	if (self.impulse == 107){
-		poopy("monster_zombie");
-		poopy("monster_demon1");
-		poopy("monster_shambler");
-		poopy("monster_shalrath");
-		poopy("monster_wizard");
-		poopy("monster_knight");
-		poopy("monster_ogre");
-		poopy("monster_hell_knight");
-		poopy("monster_tarbaby");
-	}
-	
-	if (self.impulse == 202){
-		fdbg_redUp();
-	}else if (self.impulse == 203){
-		fdbg_redDown();
-	}else if (self.impulse == 204){
-		fdbg_greenUp();
-	}else if (self.impulse == 205){
-		fdbg_greenDown();
-	}else if (self.impulse == 206){
-		fdbg_blueUp();
-	}else if (self.impulse == 207){
-		fdbg_blueDown();
-	}else if (self.impulse == 208){
-		fdbg_densityUp();
-	}else if (self.impulse == 209){
-		fdbg_densityDown();
-	}
 	
 	if (self.impulse == 255)
 		QuadCheat ();
-		
-	D_SK_handleImpulse(self.impulse);
 	
 	self.impulse = 0;
 };
