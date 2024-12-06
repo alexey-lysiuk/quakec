@@ -36,6 +36,7 @@ jobs:
             rerelease/quakec_rogue
             rogue
             smp/src
+            zer
           )
 
           for project in ${PROJECTS[@]}; do
