@@ -19,7 +19,7 @@ chainlit.qc		//dhm - The Crucify Spear
 wall.qc		//dhm - Exploding wall
 pbeam.qc		//dhm - The Stun gun
 
-Hipsound.qc		//dhm - Hipnotic Sound entities
+hipsound.qc		//dhm - Hipnotic Sound entities
 //Hiprot.qc		//dhm - Hipnotic rotation
 //Hipsubs.qc	//dhm - Hipnotic SUB routines
 
@@ -43,7 +43,7 @@ trog.qc		// Troglodyte - Zerstorer!!
 enforcer.qc		// registered
 enforce2.qc		// Mega-enforcer - Zerstorer!!
 turret.qc		//dhm - laser turret
-zerst.qc		//dhm - The Zerstörer!!
+zerst.qc		//dhm - The Zerstorer!!
 tarbaby.qc		// registered
 hknight.qc		// registered
 fish.qc		// registered
