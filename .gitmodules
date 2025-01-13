@@ -12,7 +12,7 @@
 	url = https://github.com/fabiolimamp/alkaline.git
 [submodule "progs_dump"]
 	path = progs_dump
-	url = https://github.com/dumptruckDS/progs_dump_qc.git
+	url = https://github.com/progs-dump-dev/progs_dump.git
 [submodule "smp"]
 	path = smp
 	url = https://github.com/quake-mapping-community/smp.git

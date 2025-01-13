@@ -28,7 +28,7 @@ jobs:
             hipnotic
             honey
             id1
-            progs_dump
+            progs_dump/qc
             remobilize
             rerelease/quakec
             rerelease/quakec_hipnotic
