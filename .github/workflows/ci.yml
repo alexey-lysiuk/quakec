@@ -13,10 +13,22 @@ jobs:
         with:
           submodules: true
 
-      - name: Download FTEQCC
+      - name: Compile FTEQCC
         run: |
-          wget -q https://www.fteqcc.org/dl/fteqcc_linux64.zip
-          unzip fteqcc_linux64.zip fteqcc64
+          mkdir fteqcc
+
+          # The last commit that compile Alkaline without segmentation fault
+          # See https://github.com/fte-team/fteqw/issues/328
+          COMMIT=0df247d4c188133d5f8f309607d2278ebad4ce13
+
+          cd fteqcc
+          wget -q https://github.com/fte-team/fteqw/archive/$COMMIT.tar.gz
+          tar -xf $COMMIT.tar.gz
+
+          cd fteqw-$COMMIT
+          cmake .
+          cmake --build . --target fteqcc --parallel
+          cp fteqcc ..
 
       - name: Compile QuakeC code
         shell: bash
@@ -38,17 +50,18 @@ jobs:
             smp/src
             zer
           )
+          FTEQCC=./fteqcc/fteqcc
 
           for project in ${PROJECTS[@]}; do
             echo ::group::$project
-            ./fteqcc64 -src $project
+            $FTEQCC -src $project
             echo ::endgroup::
           done
 
           # Special case to avoid compilation error in drake/thor.qc
           # where 'static' keyword is used as variable name
           echo ::group::drake
-            ./fteqcc64 -src drake -Kno-static
+            $FTEQCC -src drake -Kno-static
           echo ::endgroup::
 
       - name: List Directories
