@@ -64,6 +64,11 @@ jobs:
             $FTEQCC -src drake -Kno-static
           echo ::endgroup::
 
+          # Special case for mg3 to workaround 'unknown value' errors
+          echo ::group::rerelease/quakec_mg3
+            $FTEQCC -src rerelease/quakec_mg3 -Fautoproto
+          echo ::endgroup::
+
       - name: List Directories
         if: always()
         shell: bash
